@@ -302,6 +302,7 @@ const DashboardVendor = () => {
           `http://31.97.206.144:7021/api/vendor/dashboard/${vendorId}?duration=${chartFilter}`
         );
         setData(response.data);
+        console.log("Dashboard Data:", response.data);
       } catch (err) {
         setError(err.response?.data?.message || "Error fetching dashboard");
       } finally {

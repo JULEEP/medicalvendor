@@ -50,7 +50,7 @@ const VendorRegisterPage = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
-        
+
         setFormData(prev => ({
           ...prev,
           latitude: latitude.toFixed(6),
@@ -58,14 +58,14 @@ const VendorRegisterPage = () => {
         }));
 
         setIsGettingLocation(false);
-        
+
         // Optional: Auto-fill address using reverse geocoding
         reverseGeocode(latitude, longitude);
       },
       (error) => {
         setIsGettingLocation(false);
         let errorMessage = 'Location access denied or failed';
-        
+
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = 'Location access denied. Please allow location access or enter manually.';
@@ -80,7 +80,7 @@ const VendorRegisterPage = () => {
             errorMessage = 'An unknown error occurred. Please enter location manually.';
             break;
         }
-        
+
         setError(errorMessage);
       },
       {
@@ -98,13 +98,14 @@ const VendorRegisterPage = () => {
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       );
       const data = await response.json();
-      
+
       if (data && data.display_name) {
         setFormData(prev => ({
           ...prev,
           address: data.display_name
         }));
       }
+      console.log('Reverse geocoding successful:', data);
     } catch (error) {
       console.log('Reverse geocoding failed, user can enter address manually');
     }
@@ -133,7 +134,7 @@ const VendorRegisterPage = () => {
         const categories = [...prev.categories];
         if (name === 'image') {
           categories[categoryIndex].image = files[0];
-          
+
           // Generate preview for category image
           if (files[0]) {
             generatePreview(files[0]).then(preview => {
@@ -152,7 +153,7 @@ const VendorRegisterPage = () => {
     } else {
       if (files) {
         setFormData((prev) => ({ ...prev, [name]: files[0] }));
-        
+
         // Generate preview for main files
         if (files[0]) {
           const preview = await generatePreview(files[0]);
@@ -173,7 +174,7 @@ const VendorRegisterPage = () => {
         categories[categoryIndex].image = null;
         return { ...prev, categories };
       });
-      
+
       setImagePreviews(prev => {
         const categoryImages = [...prev.categoryImages];
         categoryImages[categoryIndex] = null;
@@ -183,7 +184,7 @@ const VendorRegisterPage = () => {
       // Remove main file
       setFormData(prev => ({ ...prev, [fieldName]: null }));
       setImagePreviews(prev => ({ ...prev, [fieldName]: null }));
-      
+
       // Reset file input
       const fileInput = document.getElementById(fieldName);
       if (fileInput) fileInput.value = '';
@@ -207,7 +208,7 @@ const VendorRegisterPage = () => {
       categories.splice(index, 1);
       return { ...prev, categories };
     });
-    
+
     setImagePreviews(prev => {
       const categoryImages = [...prev.categoryImages];
       categoryImages.splice(index, 1);
@@ -256,7 +257,7 @@ const VendorRegisterPage = () => {
     setIsLoading(true);
 
     const missingFieldsList = validateForm();
-    
+
     if (missingFieldsList.length > 0) {
       setMissingFields(missingFieldsList);
       setError(`Please fill in all required fields (${missingFieldsList.length} missing)`);
@@ -297,7 +298,7 @@ const VendorRegisterPage = () => {
       );
 
       const successMessage = `Pharmacy registered successfully!\n\nYour Vendor ID: ${response.data.vendorCredentials.vendorId}\nPassword: ${response.data.vendorCredentials.password}`;
-      
+
       // Set in UI
       setSuccess(successMessage);
 
@@ -324,9 +325,9 @@ const VendorRegisterPage = () => {
           <div className="flex items-center space-x-3">
             {isImage && preview ? (
               <div className="relative">
-                <img 
-                  src={preview} 
-                  alt="Preview" 
+                <img
+                  src={preview}
+                  alt="Preview"
                   className="w-12 h-12 object-cover rounded-lg border-2 border-blue-200 shadow-sm"
                 />
                 <button
@@ -421,7 +422,7 @@ const VendorRegisterPage = () => {
               <FaStore className="text-blue-600 mr-3 text-lg" />
               <h2 className="text-xl font-bold text-gray-800">Pharmacy Information</h2>
             </div>
-            
+
             <div className="space-y-4">
               {/* Pharmacy Name */}
               <div>
@@ -436,11 +437,10 @@ const VendorRegisterPage = () => {
                   onChange={handleChange}
                   placeholder="Enter pharmacy name"
                   required
-                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                    isFieldMissing('Pharmacy Name') 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                      : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
-                  }`}
+                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Pharmacy Name')
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                    }`}
                 />
               </div>
 
@@ -452,11 +452,10 @@ const VendorRegisterPage = () => {
                 </label>
                 <label
                   htmlFor="image"
-                  className={`flex items-center px-6 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg w-fit font-semibold ${
-                    isFieldMissing('Pharmacy Image')
-                      ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
-                      : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
-                  }`}
+                  className={`flex items-center px-6 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg w-fit font-semibold ${isFieldMissing('Pharmacy Image')
+                    ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
+                    : 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
+                    }`}
                 >
                   <FaCloudUploadAlt className="mr-3" /> Upload Pharmacy Image
                 </label>
@@ -469,8 +468,8 @@ const VendorRegisterPage = () => {
                   className="hidden"
                   required
                 />
-                <FilePreview 
-                  file={formData.image} 
+                <FilePreview
+                  file={formData.image}
                   preview={imagePreviews.image}
                   fieldName="image"
                   isImage={true}
@@ -492,14 +491,13 @@ const VendorRegisterPage = () => {
                     onChange={handleChange}
                     placeholder="Enter latitude"
                     required
-                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      isFieldMissing('Latitude') 
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                        : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
-                    }`}
+                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Latitude')
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                      : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                      }`}
                   />
                 </div>
-                
+
                 {/* ✅ UPDATED: Clickable Location Icon */}
                 <div className="md:col-span-2 flex items-center justify-center h-full pb-2">
                   <button
@@ -516,7 +514,7 @@ const VendorRegisterPage = () => {
                     )}
                   </button>
                 </div>
-                
+
                 <div className="md:col-span-5">
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Longitude *
@@ -530,11 +528,10 @@ const VendorRegisterPage = () => {
                     onChange={handleChange}
                     placeholder="Enter longitude"
                     required
-                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      isFieldMissing('Longitude') 
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                        : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
-                    }`}
+                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Longitude')
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                      : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                      }`}
                   />
                 </div>
               </div>
@@ -577,11 +574,10 @@ const VendorRegisterPage = () => {
                   placeholder="Enter complete pharmacy address"
                   rows={3}
                   required
-                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all resize-none ${
-                    isFieldMissing('Address') 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                      : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
-                  }`}
+                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all resize-none ${isFieldMissing('Address')
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                    : 'border-gray-200 focus:border-blue-500 focus:ring-blue-200'
+                    }`}
                 />
               </div>
             </div>
@@ -607,15 +603,14 @@ const VendorRegisterPage = () => {
             {formData.categories.map((cat, index) => {
               const isCategoryNameMissing = isFieldMissing(`Category ${index + 1} Name`);
               const isCategoryImageMissing = isFieldMissing(`Category ${index + 1} Image`);
-              
+
               return (
-                <div 
-                  key={index} 
-                  className={`mb-4 p-4 border-2 rounded-xl bg-white shadow-sm ${
-                    isCategoryNameMissing || isCategoryImageMissing 
-                      ? 'border-red-300 ring-2 ring-red-100' 
-                      : 'border-purple-100'
-                  } transition-all`}
+                <div
+                  key={index}
+                  className={`mb-4 p-4 border-2 rounded-xl bg-white shadow-sm ${isCategoryNameMissing || isCategoryImageMissing
+                    ? 'border-red-300 ring-2 ring-red-100'
+                    : 'border-purple-100'
+                    } transition-all`}
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
                     <div>
@@ -630,21 +625,19 @@ const VendorRegisterPage = () => {
                         onChange={(e) => handleChange(e, index, true)}
                         name="name"
                         required
-                        className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                          isCategoryNameMissing 
-                            ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                            : 'border-gray-200 focus:border-purple-500 focus:ring-purple-200'
-                        }`}
+                        className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isCategoryNameMissing
+                          ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                          : 'border-gray-200 focus:border-purple-500 focus:ring-purple-200'
+                          }`}
                       />
                     </div>
                     <div className="flex items-end space-x-4">
                       <label
                         htmlFor={`categoryImage${index}`}
-                        className={`flex items-center px-4 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg text-sm font-semibold flex-1 justify-center ${
-                          isCategoryImageMissing
-                            ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
-                            : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
-                        }`}
+                        className={`flex items-center px-4 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg text-sm font-semibold flex-1 justify-center ${isCategoryImageMissing
+                          ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
+                          : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600'
+                          }`}
                       >
                         <FaCloudUploadAlt className="mr-2" /> Upload Image
                       </label>
@@ -669,8 +662,8 @@ const VendorRegisterPage = () => {
                       )}
                     </div>
                   </div>
-                  <FilePreview 
-                    file={cat.image} 
+                  <FilePreview
+                    file={cat.image}
                     preview={imagePreviews.categoryImages[index]}
                     fieldName="image"
                     categoryIndex={index}
@@ -682,11 +675,10 @@ const VendorRegisterPage = () => {
           </div>
 
           {/* Vendor Details Section */}
-          <div className={`bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border ${
-            isFieldMissing('Vendor Name') || isFieldMissing('Vendor Email') || isFieldMissing('Vendor Phone') 
-              ? 'border-red-300 ring-2 ring-red-100' 
-              : 'border-indigo-100'
-          } shadow-sm transition-all`}>
+          <div className={`bg-gradient-to-r from-indigo-50 to-blue-50 p-6 rounded-2xl border ${isFieldMissing('Vendor Name') || isFieldMissing('Vendor Email') || isFieldMissing('Vendor Phone')
+            ? 'border-red-300 ring-2 ring-red-100'
+            : 'border-indigo-100'
+            } shadow-sm transition-all`}>
             <div className="flex items-center mb-4">
               <FaUser className="text-indigo-600 mr-3 text-lg" />
               <h2 className="text-xl font-bold text-gray-800">Vendor Details</h2>
@@ -705,11 +697,10 @@ const VendorRegisterPage = () => {
                   onChange={handleChange}
                   placeholder="Enter vendor full name"
                   required
-                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                    isFieldMissing('Vendor Name') 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                      : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-200'
-                  }`}
+                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Vendor Name')
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                    : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-200'
+                    }`}
                 />
               </div>
               <div>
@@ -724,11 +715,10 @@ const VendorRegisterPage = () => {
                   onChange={handleChange}
                   placeholder="Enter vendor email address"
                   required
-                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                    isFieldMissing('Vendor Email') 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                      : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-200'
-                  }`}
+                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Vendor Email')
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                    : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-200'
+                    }`}
                 />
               </div>
               <div>
@@ -740,25 +730,30 @@ const VendorRegisterPage = () => {
                   type="text"
                   name="vendorPhone"
                   value={formData.vendorPhone}
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); // digits only
+                    if (value.length <= 10) {
+                      handleChange({
+                        target: { name: "vendorPhone", value }
+                      });
+                    }
+                  }}
                   placeholder="Enter vendor phone number"
                   required
-                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                    isFieldMissing('Vendor Phone') 
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                      : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-200'
-                  }`}
+                  className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Vendor Phone')
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                    : 'border-gray-200 focus:border-indigo-500 focus:ring-indigo-200'
+                    }`}
                 />
               </div>
             </div>
           </div>
 
           {/* Document Uploads Section */}
-          <div className={`bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-2xl border ${
-            isFieldMissing('Aadhar Number') || isFieldMissing('Aadhar Document') || isFieldMissing('PAN Card Number') || isFieldMissing('PAN Card Document') || isFieldMissing('License Number') || isFieldMissing('License Document')
-              ? 'border-red-300 ring-2 ring-red-100' 
-              : 'border-orange-100'
-          } shadow-sm transition-all`}>
+          <div className={`bg-gradient-to-r from-orange-50 to-red-50 p-6 rounded-2xl border ${isFieldMissing('Aadhar Number') || isFieldMissing('Aadhar Document') || isFieldMissing('PAN Card Number') || isFieldMissing('PAN Card Document') || isFieldMissing('License Number') || isFieldMissing('License Document')
+            ? 'border-red-300 ring-2 ring-red-100'
+            : 'border-orange-100'
+            } shadow-sm transition-all`}>
             <div className="flex items-center mb-4">
               <FaIdCard className="text-orange-600 mr-3 text-lg" />
               <h2 className="text-xl font-bold text-gray-800">Required Documents</h2>
@@ -773,17 +768,24 @@ const VendorRegisterPage = () => {
                     {isFieldMissing('Aadhar Number') && <span className="text-red-500 ml-2">← Required</span>}
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     name="aadhar"
                     value={formData.aadhar}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ""); // allow only digits
+                      if (value.length <= 12) {
+                        handleChange({
+                          target: { name: "aadhar", value },
+                        });
+                      }
+                    }}
                     placeholder="Enter Aadhar number"
+                    maxLength={12}
                     required
-                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      isFieldMissing('Aadhar Number') 
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                        : 'border-gray-200 focus:border-orange-500 focus:ring-orange-200'
-                    }`}
+                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Aadhar Number')
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                      : 'border-gray-200 focus:border-orange-500 focus:ring-orange-200'
+                      }`}
                   />
                 </div>
                 <div>
@@ -793,11 +795,10 @@ const VendorRegisterPage = () => {
                   </label>
                   <label
                     htmlFor="aadharFile"
-                    className={`flex items-center px-4 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg w-full font-semibold justify-center ${
-                      isFieldMissing('Aadhar Document')
-                        ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
-                        : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-                    }`}
+                    className={`flex items-center px-4 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg w-full font-semibold justify-center ${isFieldMissing('Aadhar Document')
+                      ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
+                      : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                      }`}
                   >
                     <FaCloudUploadAlt className="mr-2" /> Upload Aadhar Document
                   </label>
@@ -810,8 +811,8 @@ const VendorRegisterPage = () => {
                     className="hidden"
                     required
                   />
-                  <FilePreview 
-                    file={formData.aadharFile} 
+                  <FilePreview
+                    file={formData.aadharFile}
                     preview={imagePreviews.aadharFile}
                     fieldName="aadharFile"
                     isImage={formData.aadharFile?.type?.includes('image')}
@@ -833,11 +834,10 @@ const VendorRegisterPage = () => {
                     onChange={handleChange}
                     placeholder="Enter PAN Card number"
                     required
-                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      isFieldMissing('PAN Card Number') 
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                        : 'border-gray-200 focus:border-orange-500 focus:ring-orange-200'
-                    }`}
+                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('PAN Card Number')
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                      : 'border-gray-200 focus:border-orange-500 focus:ring-orange-200'
+                      }`}
                   />
                 </div>
                 <div>
@@ -847,11 +847,10 @@ const VendorRegisterPage = () => {
                   </label>
                   <label
                     htmlFor="panCardFile"
-                    className={`flex items-center px-4 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg w-full font-semibold justify-center ${
-                      isFieldMissing('PAN Card Document')
-                        ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
-                        : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-                    }`}
+                    className={`flex items-center px-4 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg w-full font-semibold justify-center ${isFieldMissing('PAN Card Document')
+                      ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
+                      : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                      }`}
                   >
                     <FaCloudUploadAlt className="mr-2" /> Upload PAN Card
                   </label>
@@ -864,8 +863,8 @@ const VendorRegisterPage = () => {
                     className="hidden"
                     required
                   />
-                  <FilePreview 
-                    file={formData.panCardFile} 
+                  <FilePreview
+                    file={formData.panCardFile}
                     preview={imagePreviews.panCardFile}
                     fieldName="panCardFile"
                     isImage={formData.panCardFile?.type?.includes('image')}
@@ -887,11 +886,10 @@ const VendorRegisterPage = () => {
                     onChange={handleChange}
                     placeholder="Enter License number"
                     required
-                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${
-                      isFieldMissing('License Number') 
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50' 
-                        : 'border-gray-200 focus:border-orange-500 focus:ring-orange-200'
-                    }`}
+                    className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('License Number')
+                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
+                      : 'border-gray-200 focus:border-orange-500 focus:ring-orange-200'
+                      }`}
                   />
                 </div>
                 <div>
@@ -901,11 +899,10 @@ const VendorRegisterPage = () => {
                   </label>
                   <label
                     htmlFor="licenseFile"
-                    className={`flex items-center px-4 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg w-full font-semibold justify-center ${
-                      isFieldMissing('License Document')
-                        ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
-                        : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
-                    }`}
+                    className={`flex items-center px-4 py-3 text-white rounded-xl cursor-pointer transition-all shadow-lg w-full font-semibold justify-center ${isFieldMissing('License Document')
+                      ? 'bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700'
+                      : 'bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600'
+                      }`}
                   >
                     <FaCloudUploadAlt className="mr-2" /> Upload License
                   </label>
@@ -918,8 +915,8 @@ const VendorRegisterPage = () => {
                     className="hidden"
                     required
                   />
-                  <FilePreview 
-                    file={formData.licenseFile} 
+                  <FilePreview
+                    file={formData.licenseFile}
                     preview={imagePreviews.licenseFile}
                     fieldName="licenseFile"
                     isImage={formData.licenseFile?.type?.includes('image')}

@@ -52,7 +52,7 @@ const Navbar = ({ setIsCollapsed, isCollapsed }) => {
 
       } catch (error) {
         console.error("Error fetching data:", error);
-        setError("Failed to fetch vendor data");
+        // setError("Failed to fetch vendor data");
       }
     };
 
