@@ -739,6 +739,8 @@ const VendorRegisterPage = () => {
                     }
                   }}
                   placeholder="Enter vendor phone number"
+                  minLength={10}
+                  maxLength={10}
                   required
                   className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Vendor Phone')
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'
@@ -781,6 +783,7 @@ const VendorRegisterPage = () => {
                     }}
                     placeholder="Enter Aadhar number"
                     maxLength={12}
+                    minLength={12}
                     required
                     className={`w-full px-4 py-3 text-sm border-2 rounded-xl focus:outline-none focus:ring-2 transition-all ${isFieldMissing('Aadhar Number')
                       ? 'border-red-300 focus:border-red-500 focus:ring-red-200 bg-red-50'

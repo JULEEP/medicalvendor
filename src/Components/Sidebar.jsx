@@ -43,7 +43,7 @@ const SidebarVendor = ({ isCollapsed, isMobile }) => {
       dropdown: [
         { name: "My Orders", path: "/orders" },
         { name: "Pending Orders", path: "/pendingorders" },
-        { name: "Delivered Orders", path: "/deliveredorders" },
+        // { name: "Delivered Orders", path: "/deliveredorders" },
        { name: "Priodic Orders", path: "/priodicorders" },
        { name: "Prescription Orders", path: "/prescriptionorders" },
         { name: "User Prescription", path: "/prescription" },

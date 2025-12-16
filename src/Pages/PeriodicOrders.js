@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { 
-  FaEdit, FaTrash, FaTimes, FaFileInvoiceDollar, FaSearch, 
+import {
+  FaEdit, FaTrash, FaTimes, FaFileInvoiceDollar, FaSearch,
   FaEye, FaUser, FaMapMarkerAlt, FaMoneyBillWave, FaDownload,
   FaCalendarAlt, FaFileExport, FaPhone, FaEnvelope, FaMotorcycle,
   FaClock, FaBox, FaPercentage, FaCreditCard, FaReceipt,
@@ -23,13 +23,13 @@ const PeriodicOrders = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusEdit, setStatusEdit] = useState("");
   const [updatingStatus, setUpdatingStatus] = useState(false);
-  
+
   // New states for filters and pagination
   const [planTypeFilter, setPlanTypeFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [ordersPerPage] = useState(10);
-  
+
   const invoiceRef = useRef();
 
   useEffect(() => {
@@ -47,9 +47,9 @@ const PeriodicOrders = () => {
 
       const response = await fetch(`http://31.97.206.144:7021/api/vendor/periodicorders/${vendorId}`);
       const data = await response.json();
-      
+
       if (!response.ok) throw new Error(data.message || 'Failed to fetch periodic orders');
-      
+
       setOrders(data.orders || []);
     } catch (err) {
       setError(err.message);
@@ -81,7 +81,7 @@ const PeriodicOrders = () => {
 
       // Update local state
       setOrders((prev) =>
-        prev.map((o) => 
+        prev.map((o) =>
           o._id === selectedOrder._id ? { ...o, status: statusEdit } : o
         )
       );
@@ -113,7 +113,7 @@ const PeriodicOrders = () => {
     const orderId = order._id || '';
     const planType = order.planType || '';
     const riderName = order.assignedRider?.name || '';
-    
+
     const matchQuery = (
       userName.toLowerCase().includes(searchLower) ||
       userMobile.includes(searchQuery) ||
@@ -127,12 +127,12 @@ const PeriodicOrders = () => {
       (startDate ? new Date(order.createdAt) >= new Date(startDate) : true) &&
       (endDate ? new Date(order.createdAt) <= new Date(endDate) : true);
 
-    const matchPlanType = 
-      planTypeFilter === "all" || 
+    const matchPlanType =
+      planTypeFilter === "all" ||
       order.planType?.toLowerCase().includes(planTypeFilter.toLowerCase());
 
-    const matchStatus = 
-      statusFilter === "all" || 
+    const matchStatus =
+      statusFilter === "all" ||
       order.status?.toLowerCase() === statusFilter.toLowerCase();
 
     return matchQuery && matchDate && matchPlanType && matchStatus;
@@ -161,7 +161,7 @@ const PeriodicOrders = () => {
   const getDisplayedPages = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
@@ -169,12 +169,12 @@ const PeriodicOrders = () => {
     } else {
       const startPage = Math.max(1, currentPage - 2);
       const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-      
+
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
     }
-    
+
     return pages;
   };
 
@@ -341,14 +341,14 @@ const PeriodicOrders = () => {
           {filteredOrders.length !== orders.length && ` (filtered from ${orders.length} total)`}
         </div>
       </div>
-      
+
       {loading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           <span className="ml-3 text-gray-600">Loading periodic orders...</span>
         </div>
       )}
-      
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
           {error}
@@ -365,11 +365,11 @@ const PeriodicOrders = () => {
             </label>
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-              <input 
-                type="text" 
-                placeholder="Search by Customer Name, Mobile, Order ID, Plan Type, or Rider Name..." 
-                value={searchQuery} 
-                onChange={handleSearch} 
+              <input
+                type="text"
+                placeholder="Search by Customer Name, Mobile, Order ID, Plan Type, or Rider Name..."
+                value={searchQuery}
+                onChange={handleSearch}
                 className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -595,25 +595,29 @@ const PeriodicOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-green-600">
-                      {formatCurrency(order.total || order.totalAmount)}
+                      {formatCurrency(
+                        order.orderItems.reduce(
+                          (sum, item) => sum + (Number(item.price) || 0),
+                          0
+                        )
+                      )}
                     </div>
-                    {order.discountAmount > 0 && (
+                    {/* {order.discountAmount > 0 && (
                       <div className="text-xs text-red-600">
                         -{formatCurrency(order.discountAmount)}
                       </div>
                     )}
                     <div className="text-xs text-gray-500">
                       Subtotal: {formatCurrency(order.subtotal)}
-                    </div>
+                    </div> */}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 capitalize">
                       {order.paymentMethod}
                     </div>
-                    <div className={`text-xs font-medium ${
-                      order.paymentStatus === 'Completed' ? 'text-green-600' : 
-                      order.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-gray-600'
-                    }`}>
+                    <div className={`text-xs font-medium ${order.paymentStatus === 'Completed' ? 'text-green-600' :
+                        order.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-gray-600'
+                      }`}>
                       {order.paymentStatus}
                     </div>
                     {order.assignedRider && (
@@ -641,21 +645,21 @@ const PeriodicOrders = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       {/* ✅ EDIT STATUS BUTTON */}
-                      <button 
+                      <button
                         onClick={() => openStatusModal(order)}
                         className="text-purple-600 hover:text-purple-800 transition-colors p-2 rounded-full hover:bg-purple-50"
                         title="Edit Status"
                       >
                         <FaEdit size={16} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => openOrderModal(order)}
                         className="text-blue-600 hover:text-blue-800 transition-colors p-2 rounded-full hover:bg-blue-50"
                         title="View Details"
                       >
                         <FaEye size={16} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => openInvoiceModal(order)}
                         className="text-green-600 hover:text-green-800 transition-colors p-2 rounded-full hover:bg-green-50"
                         title="Download Invoice"
@@ -671,8 +675,8 @@ const PeriodicOrders = () => {
                 <td colSpan="7" className="px-6 py-12 text-center">
                   <div className="text-gray-500 text-lg">No periodic orders found</div>
                   <div className="text-gray-400 text-sm mt-2">
-                    {searchQuery || startDate || endDate || planTypeFilter !== "all" || statusFilter !== "all" 
-                      ? 'Try adjusting your search or filters' 
+                    {searchQuery || startDate || endDate || planTypeFilter !== "all" || statusFilter !== "all"
+                      ? 'Try adjusting your search or filters'
                       : 'No periodic orders available'}
                   </div>
                 </td>
@@ -692,17 +696,16 @@ const PeriodicOrders = () => {
                 </span>{" "}
                 of <span className="font-medium">{filteredOrders.length}</span> results
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 {/* Previous Button */}
                 <button
                   onClick={prevPage}
                   disabled={currentPage === 1}
-                  className={`px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium ${
-                    currentPage === 1
+                  className={`px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium ${currentPage === 1
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   <FaChevronLeft size={14} />
                 </button>
@@ -712,11 +715,10 @@ const PeriodicOrders = () => {
                   <button
                     key={page}
                     onClick={() => paginate(page)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                      currentPage === page
+                    className={`px-4 py-2 rounded-lg text-sm font-medium ${currentPage === page
                         ? "bg-blue-600 text-white"
                         : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                    }`}
+                      }`}
                   >
                     {page}
                   </button>
@@ -726,11 +728,10 @@ const PeriodicOrders = () => {
                 <button
                   onClick={nextPage}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium ${
-                    currentPage === totalPages
+                  className={`px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium ${currentPage === totalPages
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   <FaChevronRight size={14} />
                 </button>
@@ -768,14 +769,14 @@ const PeriodicOrders = () => {
                 <h3 className="text-xl font-bold text-gray-900">Update Order Status</h3>
                 <p className="text-gray-500 text-sm mt-1">Order ID: {selectedOrder._id.slice(-8)}</p>
               </div>
-              <button 
+              <button
                 onClick={closeStatusModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
               >
                 <FaTimes size={20} />
               </button>
             </div>
-            
+
             <div className="p-6">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -784,7 +785,7 @@ const PeriodicOrders = () => {
                   </span>
                 </label>
               </div>
-              
+
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   New Status
@@ -800,7 +801,7 @@ const PeriodicOrders = () => {
                   <option value="Delivered">Delivered</option>
                   <option value="Cancelled">Cancelled</option>
                 </select>
-                
+
                 {statusEdit === 'Cancelled' && (
                   <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-sm text-yellow-800">
@@ -850,14 +851,14 @@ const PeriodicOrders = () => {
                 <h3 className="text-2xl font-bold text-gray-900">Periodic Order Details</h3>
                 <p className="text-gray-500 text-sm mt-1">Order ID: {selectedOrder._id}</p>
               </div>
-              <button 
+              <button
                 onClick={closeOrderModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
               >
                 <FaTimes size={24} />
               </button>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Plan Information Banner */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -981,10 +982,9 @@ const PeriodicOrders = () => {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-gray-200">
                       <span className="text-gray-600">Payment Status</span>
-                      <span className={`font-medium ${
-                        selectedOrder.paymentStatus === 'Completed' ? 'text-green-600' : 
-                        selectedOrder.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-gray-600'
-                      }`}>
+                      <span className={`font-medium ${selectedOrder.paymentStatus === 'Completed' ? 'text-green-600' :
+                          selectedOrder.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-gray-600'
+                        }`}>
                         {selectedOrder.paymentStatus}
                       </span>
                     </div>
@@ -1001,8 +1001,8 @@ const PeriodicOrders = () => {
                     <div className="grid grid-cols-1 gap-4">
                       <div className="flex items-center space-x-4">
                         {selectedOrder.assignedRider.profileImage ? (
-                          <img 
-                            src={selectedOrder.assignedRider.profileImage} 
+                          <img
+                            src={selectedOrder.assignedRider.profileImage}
                             alt={selectedOrder.assignedRider.name}
                             className="h-16 w-16 rounded-full object-cover"
                           />
@@ -1110,7 +1110,7 @@ const PeriodicOrders = () => {
                   Pricing Details
                 </h4>
                 <div className="space-y-3 max-w-md">
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                  {/* <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Subtotal</span>
                     <span className="font-medium text-gray-900">
                       {formatCurrency(selectedOrder.subtotal)}
@@ -1119,19 +1119,26 @@ const PeriodicOrders = () => {
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Delivery Charge</span>
                     <span className="font-medium text-gray-900">{formatCurrency(selectedOrder.deliveryCharge)}</span>
-                  </div>
-                  {selectedOrder.discountAmount > 0 && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="text-gray-600 flex items-center">
-                        <FaPercentage className="text-green-600 mr-1" size={12} />
-                        Discount ({selectedOrder.couponCode})
-                      </span>
-                      <span className="font-medium text-green-600">-{formatCurrency(selectedOrder.discountAmount)}</span>
+                  </div> */}
+                  {selectedOrder.orderItems.map((item) => (
+                    <div key={item._id} className="flex justify-between text-sm text-gray-600">
+                      <span>{item.name}</span>
+                      <span>{formatCurrency(item.price || 0)}</span>
                     </div>
-                  )}
-                  <div className="flex justify-between items-center py-3 border-t border-gray-300">
-                    <span className="text-lg font-bold text-gray-900">Total Amount</span>
-                    <span className="text-lg font-bold text-green-600">{formatCurrency(selectedOrder.total || selectedOrder.totalAmount)}</span>
+                  ))}
+
+                  <hr className="my-3" />
+
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Total Amount</span>
+                    <span className="text-green-600">
+                      {formatCurrency(
+                        selectedOrder.orderItems.reduce(
+                          (sum, item) => sum + (Number(item.price) || 0),
+                          0
+                        )
+                      )}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -1172,16 +1179,14 @@ const PeriodicOrders = () => {
                   <div className="space-y-4">
                     {selectedOrder.statusTimeline.map((timeline, index) => (
                       <div key={timeline._id} className="flex items-start space-x-4">
-                        <div className={`flex-shrink-0 w-3 h-3 rounded-full mt-2 ${
-                          timeline.status === 'Delivered' ? 'bg-green-500' : 
-                          timeline.status === 'Cancelled' ? 'bg-red-500' : 'bg-blue-500'
-                        }`}></div>
+                        <div className={`flex-shrink-0 w-3 h-3 rounded-full mt-2 ${timeline.status === 'Delivered' ? 'bg-green-500' :
+                            timeline.status === 'Cancelled' ? 'bg-red-500' : 'bg-blue-500'
+                          }`}></div>
                         <div className="flex-1 border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
                           <div className="flex justify-between items-start">
-                            <span className={`font-medium ${
-                              timeline.status === 'Delivered' ? 'text-green-700' : 
-                              timeline.status === 'Cancelled' ? 'text-red-700' : 'text-gray-900'
-                            }`}>
+                            <span className={`font-medium ${timeline.status === 'Delivered' ? 'text-green-700' :
+                                timeline.status === 'Cancelled' ? 'text-red-700' : 'text-gray-900'
+                              }`}>
                               {timeline.status}
                             </span>
                             <span className="text-sm text-gray-500">{formatDate(timeline.timestamp)}</span>
@@ -1226,14 +1231,14 @@ const PeriodicOrders = () => {
                 <h3 className="text-2xl font-bold text-gray-900">Invoice - Periodic Order</h3>
                 <p className="text-gray-500 text-sm mt-1">Order ID: {selectedOrder._id}</p>
               </div>
-              <button 
+              <button
                 onClick={closeInvoiceModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
               >
                 <FaTimes size={24} />
               </button>
             </div>
-            
+
             <div className="p-6" ref={invoiceRef}>
               <div className="mb-6">
                 <div className="text-sm text-gray-500">Date: {formatDate(selectedOrder.createdAt)}</div>
@@ -1278,7 +1283,7 @@ const PeriodicOrders = () => {
                       </tr>
                     ))}
                     {/* Additional charges */}
-                    <tr>
+                    {/* <tr>
                       <td className="border border-gray-300 px-4 py-2">Delivery Charge</td>
                       <td className="border border-gray-300 px-4 py-2 text-center">1</td>
                       <td className="border border-gray-300 px-4 py-2 text-right">{selectedOrder.deliveryCharge?.toFixed(2)}</td>
@@ -1291,15 +1296,18 @@ const PeriodicOrders = () => {
                         <td className="border border-gray-300 px-4 py-2 text-right text-green-600">-{selectedOrder.discountAmount?.toFixed(2)}</td>
                         <td className="border border-gray-300 px-4 py-2 text-right text-green-600">-{selectedOrder.discountAmount?.toFixed(2)}</td>
                       </tr>
-                    )}
+                    )} */}
                   </tbody>
                   <tfoot>
                     <tr>
                       <td colSpan="3" className="border border-gray-300 px-4 py-2 text-right font-semibold">
                         Grand Total:
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-right font-semibold text-green-600">
-                        ₹{(selectedOrder.total || selectedOrder.totalAmount)?.toFixed(2)}
+                      <td className="border px-4 py-2 text-center font-semibold text-green-600">
+                        ₹{selectedOrder.orderItems
+                          .filter(item => item.medicineId)
+                          .reduce((total, item) => total + (Number(item.price) || 0), 0)
+                          .toFixed(2)}
                       </td>
                     </tr>
                   </tfoot>

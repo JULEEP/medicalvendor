@@ -114,6 +114,7 @@ const PrescriptionOrders = () => {
 
     return matchQuery && matchDate;
   });
+  console.log('Filtered Orders:', filteredOrders);
 
   const openOrderModal = (order) => {
     setSelectedOrder(order);
@@ -410,23 +411,28 @@ const PrescriptionOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-green-600">
-                      {formatCurrency(order.totalAmount || order.total)}
+                      {formatCurrency(
+                        order.orderItems.reduce(
+                          (sum, item) => sum + (Number(item.medicineId.price) || 0),
+                          0
+                        )
+                      )}
                     </div>
-                    {order.discountAmount > 0 && (
+                    {/* {order.discountAmount > 0 && (
                       <div className="text-xs text-red-600">
                         -{formatCurrency(order.discountAmount)}
                       </div>
-                    )}
-                    <div className="text-xs text-gray-500">
+                    )} */}
+                    {/* <div className="text-xs text-gray-500">
                       Subtotal: {formatCurrency(order.subtotal || 0)}
-                    </div>
+                    </div> */}
                   </td>
                   <td className="px-6 py-4">
                     <div className="text-sm text-gray-900 capitalize">
                       {order.paymentMethod}
                     </div>
                     <div className={`text-xs font-medium ${order.paymentStatus === 'Completed' ? 'text-green-600' :
-                        order.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-gray-600'
+                      order.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-gray-600'
                       }`}>
                       {order.paymentStatus}
                     </div>
@@ -626,7 +632,7 @@ const PrescriptionOrders = () => {
                     <div className="flex justify-between items-center py-2 border-b border-gray-200">
                       <span className="text-gray-600">Payment Status</span>
                       <span className={`font-medium ${selectedOrder.paymentStatus === 'Completed' ? 'text-green-600' :
-                          selectedOrder.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-gray-600'
+                        selectedOrder.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-gray-600'
                         }`}>
                         {selectedOrder.paymentStatus}
                       </span>
@@ -850,13 +856,13 @@ const PrescriptionOrders = () => {
                       <div className="flex-1">
                         <div className="font-medium text-gray-900">{item.name}</div>
                         {item.medicineId && (
-                          <div className="text-sm text-gray-500 mt-1">Medicine ID: {item.medicineId}</div>
+                          <div className="text-sm text-gray-500 mt-1">Medicine ID: {item.medicineId._id}</div>
                         )}
                       </div>
                       <div className="text-right">
                         <div className="font-semibold text-gray-900">Quantity: {item.quantity}</div>
-                        {item.price && (
-                          <div className="text-sm text-gray-600">Price: {formatCurrency(item.price)}</div>
+                        {item.medicineId && (
+                          <div className="text-sm text-gray-600">Price: {formatCurrency(item.medicineId.price)}</div>
                         )}
                       </div>
                     </div>
@@ -871,7 +877,7 @@ const PrescriptionOrders = () => {
                   Pricing Details
                 </h4>
                 <div className="space-y-3 max-w-md">
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                  {/* <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Subtotal</span>
                     <span className="font-medium text-gray-900">
                       {formatCurrency(selectedOrder.subtotal || ((selectedOrder.totalAmount || selectedOrder.total) + (selectedOrder.discountAmount || 0) - (selectedOrder.deliveryCharge || 0) - (selectedOrder.platformCharge || 0)))}
@@ -880,20 +886,25 @@ const PrescriptionOrders = () => {
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Delivery Charge</span>
                     <span className="font-medium text-gray-900">{formatCurrency(selectedOrder.deliveryCharge)}</span>
-                  </div>
-                  {selectedOrder.discountAmount > 0 && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="text-gray-600 flex items-center">
-                        <FaPercentage className="text-green-600 mr-1" size={12} />
-                        Discount ({selectedOrder.couponCode})
-                      </span>
-                      <span className="font-medium text-green-600">-{formatCurrency(selectedOrder.discountAmount)}</span>
+                  </div> */}
+                  {selectedOrder.orderItems.map((item) => (
+                    <div key={item._id} className="flex justify-between text-sm text-gray-600">
+                      <span>{item.name}</span>
+                      <span>{formatCurrency(item.medicineId.price || 0)}</span>
                     </div>
-                  )}
-                  <div className="flex justify-between items-center py-3 border-t border-gray-300">
-                    <span className="text-lg font-bold text-gray-900">Total Amount</span>
-                    <span className="text-lg font-bold text-green-600">
-                      {formatCurrency(selectedOrder.totalAmount || selectedOrder.total)}
+                  ))}
+
+                  <hr className="my-3" />
+
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Total Amount</span>
+                    <span className="text-green-600">
+                      {formatCurrency(
+                        selectedOrder.orderItems.reduce(
+                          (sum, item) => sum + (Number(item.medicineId.price) || 0),
+                          0
+                        )
+                      )}
                     </span>
                   </div>
                 </div>
@@ -936,12 +947,12 @@ const PrescriptionOrders = () => {
                     {selectedOrder.statusTimeline.map((timeline, index) => (
                       <div key={timeline._id} className="flex items-start space-x-4">
                         <div className={`flex-shrink-0 w-3 h-3 rounded-full mt-2 ${timeline.status === 'Delivered' ? 'bg-green-500' :
-                            timeline.status === 'Cancelled' ? 'bg-red-500' : 'bg-blue-500'
+                          timeline.status === 'Cancelled' ? 'bg-red-500' : 'bg-blue-500'
                           }`}></div>
                         <div className="flex-1 border-b border-gray-200 pb-4 last:border-b-0 last:pb-0">
                           <div className="flex justify-between items-start">
                             <span className={`font-medium ${timeline.status === 'Delivered' ? 'text-green-700' :
-                                timeline.status === 'Cancelled' ? 'text-red-700' : 'text-gray-900'
+                              timeline.status === 'Cancelled' ? 'text-red-700' : 'text-gray-900'
                               }`}>
                               {timeline.status}
                             </span>
@@ -1027,40 +1038,29 @@ const PrescriptionOrders = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedOrder.orderItems?.map((med, idx) => (
-                      <tr key={idx}>
-                        <td className="border border-gray-300 px-4 py-2">{med.name}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-center">{med.quantity}</td>
-                      </tr>
-                    ))}
-
-                    {/* Delivery Charge */}
-                    <tr>
-                      <td className="border border-gray-300 px-4 py-2 font-medium">Delivery Charge</td>
-                      <td className="border border-gray-300 px-4 py-2 text-center">
-                        ₹{selectedOrder.deliveryCharge?.toFixed(2)}
-                      </td>
-                    </tr>
-
-                    {/* Platform Charge */}
-
-                    {/* Discount */}
-                    {selectedOrder.discountAmount > 0 && (
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2 text-green-600 font-medium">
-                          Discount ({selectedOrder.couponCode})
-                        </td>
-                        <td className="border border-gray-300 px-4 py-2 text-center text-green-600">
-                          -₹{selectedOrder.discountAmount?.toFixed(2)}
-                        </td>
-                      </tr>
-                    )}
+                    {selectedOrder.orderItems
+                      .filter(item => item.medicineId)
+                      .map((item, idx) => (
+                        <tr key={idx}>
+                          <td className="border px-4 py-2">{item.name}</td>
+                          <td className="border px-4 py-2 text-center">
+                            ₹{(Number(item.medicineId.price) || 0).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
+
+                  {/* ✅ FOOTER → ONCE */}
                   <tfoot>
                     <tr>
-                      <td className="border border-gray-300 px-4 py-2 text-right font-semibold">Grand Total:</td>
-                      <td className="border border-gray-300 px-4 py-2 text-center font-semibold text-green-600">
-                        ₹{(selectedOrder.totalAmount || selectedOrder.total)?.toFixed(2)}
+                      <td className="border px-4 py-2 text-right font-semibold">
+                        Grand Total:
+                      </td>
+                      <td className="border px-4 py-2 text-center font-semibold text-green-600">
+                        ₹{selectedOrder.orderItems
+                          .filter(item => item.medicineId)
+                          .reduce((total, item) => total + (Number(item.medicineId.price) || 0), 0)
+                          .toFixed(2)}
                       </td>
                     </tr>
                   </tfoot>

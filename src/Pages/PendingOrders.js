@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { 
-  FaEdit, FaTrash, FaTimes, FaFileInvoiceDollar, FaSearch, 
+import {
+  FaEdit, FaTrash, FaTimes, FaFileInvoiceDollar, FaSearch,
   FaEye, FaUser, FaMapMarkerAlt, FaMoneyBillWave, FaDownload,
   FaCalendarAlt, FaFileExport, FaPhone, FaEnvelope, FaMotorcycle,
   FaClock, FaBox, FaPercentage, FaCreditCard, FaReceipt,
@@ -43,9 +43,9 @@ const PendingOrders = () => {
 
       const response = await fetch(`http://31.97.206.144:7021/api/vendor/pendingorders/${vendorId}`);
       const data = await response.json();
-      
+
       if (!response.ok) throw new Error(data.message || 'Failed to fetch pending orders');
-      
+
       setOrders(data.orders || []);
     } catch (err) {
       setError(err.message || 'Something went wrong');
@@ -77,7 +77,7 @@ const PendingOrders = () => {
 
       // Update local state
       setOrders((prev) =>
-        prev.map((o) => 
+        prev.map((o) =>
           o._id === selectedOrder._id ? { ...o, status: statusEdit } : o
         )
       );
@@ -89,7 +89,7 @@ const PendingOrders = () => {
 
       alert("Order status updated successfully!");
       closeStatusModal();
-      
+
       // Refresh orders if status changed to non-pending
       if (statusEdit !== 'Pending') {
         fetchPendingOrders();
@@ -106,17 +106,17 @@ const PendingOrders = () => {
     const today = new Date();
     const firstDayOfWeek = new Date(today);
     const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    
+
     // Calculate Monday (start of week)
     const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     firstDayOfWeek.setDate(today.getDate() + diffToMonday);
     firstDayOfWeek.setHours(0, 0, 0, 0);
-    
+
     // Calculate Sunday (end of week)
     const lastDayOfWeek = new Date(firstDayOfWeek);
     lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
     lastDayOfWeek.setHours(23, 59, 59, 999);
-    
+
     return {
       start: firstDayOfWeek.toISOString().split('T')[0],
       end: lastDayOfWeek.toISOString().split('T')[0]
@@ -128,7 +128,7 @@ const PendingOrders = () => {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    
+
     return {
       start: firstDayOfMonth.toISOString().split('T')[0],
       end: lastDayOfMonth.toISOString().split('T')[0]
@@ -139,7 +139,7 @@ const PendingOrders = () => {
   const handleDateFilterChange = (filterType) => {
     setDateFilter(filterType);
     setCurrentPage(1); // Reset to first page when filter changes
-    
+
     if (filterType === "weekly") {
       const weeklyRange = getWeeklyDateRange();
       setStartDate(weeklyRange.start);
@@ -163,7 +163,7 @@ const PendingOrders = () => {
     const userMobile = order.userId?.mobile || order.user?.mobile || '';
     const orderId = order._id || '';
     const riderName = order.assignedRider?.name || '';
-    
+
     const matchQuery = (
       userName.toLowerCase().includes(searchLower) ||
       userMobile.includes(searchQuery) ||
@@ -183,6 +183,7 @@ const PendingOrders = () => {
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  console.log({ currentOrders });
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
   // Change page
@@ -352,14 +353,14 @@ const PendingOrders = () => {
           )}
         </div>
       </div>
-      
+
       {loading && (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           <span className="ml-3 text-gray-600">Loading pending orders...</span>
         </div>
       )}
-      
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg mb-4">
           {error}
@@ -376,11 +377,11 @@ const PendingOrders = () => {
             </label>
             <div className="relative">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
-              <input 
-                type="text" 
-                placeholder="Search by Customer Name, Mobile, Order ID, Status, or Rider Name..." 
-                value={searchQuery} 
-                onChange={handleSearch} 
+              <input
+                type="text"
+                placeholder="Search by Customer Name, Mobile, Order ID, Status, or Rider Name..."
+                value={searchQuery}
+                onChange={handleSearch}
                 className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -394,31 +395,28 @@ const PendingOrders = () => {
             <div className="flex space-x-2">
               <button
                 onClick={() => handleDateFilterChange("all")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  dateFilter === "all" 
-                    ? "bg-blue-600 text-white" 
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${dateFilter === "all"
+                    ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 All Time
               </button>
               <button
                 onClick={() => handleDateFilterChange("weekly")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  dateFilter === "weekly" 
-                    ? "bg-blue-600 text-white" 
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${dateFilter === "weekly"
+                    ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 This Week
               </button>
               <button
                 onClick={() => handleDateFilterChange("monthly")}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  dateFilter === "monthly" 
-                    ? "bg-blue-600 text-white" 
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${dateFilter === "monthly"
+                    ? "bg-blue-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
+                  }`}
               >
                 This Month
               </button>
@@ -535,13 +533,13 @@ const PendingOrders = () => {
                         <FaUser className="text-blue-600" size={16} />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
+                        {/* <div className="text-sm font-medium text-gray-900">
                           {getUserName(order)}
                         </div>
                         <div className="text-sm text-gray-500 flex items-center mt-1">
                           <FaPhone className="mr-1" size={12} />
                           {getUserMobile(order)}
-                        </div>
+                        </div> */}
                         <div className="text-xs text-gray-400 mt-1">
                           Order: #{order._id.slice(-8)}
                         </div>
@@ -569,7 +567,12 @@ const PendingOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-green-600">
-                      {formatCurrency(order.totalAmount)}
+                      {formatCurrency(
+                        order.orderItems.reduce(
+                          (total, item) => total + (Number(item.price) || 0),
+                          0
+                        )
+                      )}
                     </div>
                     {order.discountAmount > 0 && (
                       <div className="text-xs text-red-600">
@@ -581,9 +584,8 @@ const PendingOrders = () => {
                     <div className="text-sm text-gray-900 capitalize">
                       {order.paymentMethod}
                     </div>
-                    <div className={`text-xs font-medium ${
-                      order.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-green-600'
-                    }`}>
+                    <div className={`text-xs font-medium ${order.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-green-600'
+                      }`}>
                       {order.paymentStatus}
                     </div>
                     {order.assignedRider && (
@@ -608,21 +610,21 @@ const PendingOrders = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       {/* ✅ EDIT STATUS BUTTON */}
-                      <button 
+                      <button
                         onClick={() => openStatusModal(order)}
                         className="text-purple-600 hover:text-purple-800 transition-colors p-2 rounded-full hover:bg-purple-50"
                         title="Edit Status"
                       >
                         <FaEdit size={16} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => openOrderModal(order)}
                         className="text-blue-600 hover:text-blue-800 transition-colors p-2 rounded-full hover:bg-blue-50"
                         title="View Details"
                       >
                         <FaEye size={16} />
                       </button>
-                      <button 
+                      <button
                         onClick={() => openInvoiceModal(order)}
                         className="text-green-600 hover:text-green-800 transition-colors p-2 rounded-full hover:bg-green-50"
                         title="Download Invoice"
@@ -661,28 +663,26 @@ const PendingOrders = () => {
                 <button
                   onClick={prevPage}
                   disabled={currentPage === 1}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
-                    currentPage === 1
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${currentPage === 1
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   <FaChevronLeft size={14} className="mr-2" />
                   Previous
                 </button>
-                
+
                 <div className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium">
                   Page {currentPage} of {totalPages}
                 </div>
-                
+
                 <button
                   onClick={nextPage}
                   disabled={currentPage === totalPages}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
-                    currentPage === totalPages
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${currentPage === totalPages
                       ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                    }`}
                 >
                   Next
                   <FaChevronRight size={14} className="ml-2" />
@@ -702,14 +702,14 @@ const PendingOrders = () => {
                 <h3 className="text-xl font-bold text-gray-900">Update Order Status</h3>
                 <p className="text-gray-500 text-sm mt-1">Order ID: {selectedOrder._id.slice(-8)}</p>
               </div>
-              <button 
+              <button
                 onClick={closeStatusModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
               >
                 <FaTimes size={20} />
               </button>
             </div>
-            
+
             <div className="p-6">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -718,7 +718,7 @@ const PendingOrders = () => {
                   </span>
                 </label>
               </div>
-              
+
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   New Status
@@ -734,7 +734,7 @@ const PendingOrders = () => {
                   <option value="Delivered">Delivered</option>
                   <option value="Cancelled">Cancelled</option>
                 </select>
-                
+
                 {statusEdit === 'Rejected' && (
                   <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
                     <p className="text-sm text-yellow-800">
@@ -784,14 +784,14 @@ const PendingOrders = () => {
                 <h3 className="text-2xl font-bold text-gray-900">Order Details</h3>
                 <p className="text-gray-500 text-sm mt-1">Order ID: {selectedOrder._id}</p>
               </div>
-              <button 
+              <button
                 onClick={closeOrderModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
               >
                 <FaTimes size={24} />
               </button>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Order Summary */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -814,9 +814,8 @@ const PendingOrders = () => {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-gray-200">
                       <span className="text-gray-600">Payment Status</span>
-                      <span className={`font-medium ${
-                        selectedOrder.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-green-600'
-                      }`}>
+                      <span className={`font-medium ${selectedOrder.paymentStatus === 'Pending' ? 'text-yellow-600' : 'text-green-600'
+                        }`}>
                         {selectedOrder.paymentStatus}
                       </span>
                     </div>
@@ -893,8 +892,8 @@ const PendingOrders = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="flex items-center space-x-4">
                       {selectedOrder.assignedRider.profileImage ? (
-                        <img 
-                          src={selectedOrder.assignedRider.profileImage} 
+                        <img
+                          src={selectedOrder.assignedRider.profileImage}
                           alt={selectedOrder.assignedRider.name}
                           className="h-16 w-16 rounded-full object-cover"
                         />
@@ -1007,7 +1006,7 @@ const PendingOrders = () => {
                   Pricing Details
                 </h4>
                 <div className="space-y-3 max-w-md">
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
+                  {/* <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Subtotal</span>
                     <span className="font-medium text-gray-900">
                       {formatCurrency((selectedOrder.totalAmount || 0) + (selectedOrder.discountAmount || 0) - (selectedOrder.deliveryCharge || 0) - (selectedOrder.platformCharge || 0))}
@@ -1025,17 +1024,27 @@ const PendingOrders = () => {
                       </span>
                       <span className="font-medium text-green-600">-{formatCurrency(selectedOrder.discountAmount)}</span>
                     </div>
-                  )}
-                  <div className="flex justify-between items-center py-3 border-t border-gray-300">
-                    <span className="text-lg font-bold text-gray-900">Total Amount</span>
-                    <span className="text-lg font-bold text-green-600">{formatCurrency(selectedOrder.totalAmount)}</span>
-                  </div>
-                  {selectedOrder.paymentMethod === 'Cash on Delivery' && (
-                    <div className="flex justify-between items-center py-2 border-t border-gray-200">
-                      <span className="text-gray-600">COD Amount Received</span>
-                      <span className="font-medium text-gray-900">{formatCurrency(selectedOrder.codAmountReceived)}</span>
+                  )} */}
+                  {selectedOrder.orderItems.map((item) => (
+                    <div key={item._id} className="flex justify-between text-sm text-gray-600">
+                      <span>{item.name}</span>
+                      <span>{formatCurrency(item.price || 0)}</span>
                     </div>
-                  )}
+                  ))}
+
+                  <hr className="my-3" />
+
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Total Amount</span>
+                    <span className="text-green-600">
+                      {formatCurrency(
+                        selectedOrder.orderItems.reduce(
+                          (sum, item) => sum + (Number(item.price) || 0),
+                          0
+                        )
+                      )}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -1108,14 +1117,14 @@ const PendingOrders = () => {
                 <h3 className="text-2xl font-bold text-gray-900">Invoice</h3>
                 <p className="text-gray-500 text-sm mt-1">Order ID: {selectedOrder._id}</p>
               </div>
-              <button 
+              <button
                 onClick={closeInvoiceModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors p-2 rounded-full hover:bg-gray-100"
               >
                 <FaTimes size={24} />
               </button>
             </div>
-            
+
             <div className="p-6" ref={invoiceRef}>
               <div className="mb-6">
                 <div className="text-sm text-gray-500">Date: {formatDate(selectedOrder.createdAt)}</div>
@@ -1141,44 +1150,32 @@ const PendingOrders = () => {
                     <tr className="bg-gray-100">
                       <th className="border border-gray-300 px-4 py-2 text-left">Item Name</th>
                       <th className="border border-gray-300 px-4 py-2 text-center">Quantity</th>
-                      <th className="border border-gray-300 px-4 py-2 text-right">Price (₹)</th>
-                      <th className="border border-gray-300 px-4 py-2 text-right">Total (₹)</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {selectedOrder.orderItems?.map((med, idx) => (
-                      <tr key={idx}>
-                        <td className="border border-gray-300 px-4 py-2">{med.name}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-center">{med.quantity}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-right">{med.price?.toFixed(2) || '0.00'}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-right">
-                          {((med.price || 0) * med.quantity).toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                    {/* Additional charges */}
-                    <tr>
-                      <td className="border border-gray-300 px-4 py-2">Delivery Charge</td>
-                      <td className="border border-gray-300 px-4 py-2 text-center">1</td>
-                      <td className="border border-gray-300 px-4 py-2 text-right">{selectedOrder.deliveryCharge?.toFixed(2)}</td>
-                      <td className="border border-gray-300 px-4 py-2 text-right">{selectedOrder.deliveryCharge?.toFixed(2)}</td>
-                    </tr>
-                    {selectedOrder.discountAmount > 0 && (
-                      <tr>
-                        <td className="border border-gray-300 px-4 py-2 text-green-600">Discount ({selectedOrder.couponCode})</td>
-                        <td className="border border-gray-300 px-4 py-2 text-center">1</td>
-                        <td className="border border-gray-300 px-4 py-2 text-right text-green-600">-{selectedOrder.discountAmount?.toFixed(2)}</td>
-                        <td className="border border-gray-300 px-4 py-2 text-right text-green-600">-{selectedOrder.discountAmount?.toFixed(2)}</td>
-                      </tr>
-                    )}
+                    {selectedOrder.orderItems
+                      .filter(item => item.medicineId)
+                      .map((item, idx) => (
+                        <tr key={idx}>
+                          <td className="border px-4 py-2">{item.name}</td>
+                          <td className="border px-4 py-2 text-center">
+                            ₹{(Number(item.price) || 0).toFixed(2)}
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
+
+                  {/* ✅ FOOTER → ONCE */}
                   <tfoot>
                     <tr>
-                      <td colSpan="3" className="border border-gray-300 px-4 py-2 text-right font-semibold">
+                      <td className="border px-4 py-2 text-right font-semibold">
                         Grand Total:
                       </td>
-                      <td className="border border-gray-300 px-4 py-2 text-right font-semibold text-green-600">
-                        ₹{selectedOrder.totalAmount?.toFixed(2)}
+                      <td className="border px-4 py-2 text-center font-semibold text-green-600">
+                        ₹{selectedOrder.orderItems
+                          .filter(item => item.medicineId)
+                          .reduce((total, item) => total + (Number(item.price) || 0), 0)
+                          .toFixed(2)}
                       </td>
                     </tr>
                   </tfoot>
