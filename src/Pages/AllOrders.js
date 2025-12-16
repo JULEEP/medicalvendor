@@ -992,17 +992,14 @@ const AllOrders = () => {
                       <div className="flex-1">
                         <div className="font-medium text-gray-900">{item.name}</div>
                         {item.medicineId && (
-                          <div className="text-sm text-gray-500 mt-1">Medicine ID: {item.medicineId}</div>
+                          <div className="text-sm text-gray-500 mt-1">Medicine ID: {item.medicineId._id}</div>
                         )}
                       </div>
                       <div className="text-right">
                         <div className="font-semibold text-gray-900">Quantity: {item.quantity}</div>
-                        {item.price ? (
-                          <div className="text-sm text-gray-600">Price: {formatCurrency(item.price)}</div>
-                        ) : (
-                          <div className="text-sm text-gray-600">Price: {formatCurrency(item.medicineId.price)}
-                          </div>
-                        )}
+                        {item.medicineId && (
+                          <div className="text-sm text-gray-600">Price: {formatCurrency(item.medicineId.price)}</div>
+                        ) }
                       </div>
                     </div>
                   ))}
