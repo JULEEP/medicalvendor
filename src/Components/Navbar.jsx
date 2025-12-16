@@ -47,7 +47,7 @@ const Navbar = ({ setIsCollapsed, isCollapsed }) => {
         const notificationsRes = await axios.get(
           `http://31.97.206.144:7021/api/vendor/notifications/${vendorId}`
         );
-        setNotifications(notificationsRes.data.notifications);
+        setNotifications(notificationsRes.data.notifications || []);
         setNotificationCount(notificationsRes.data.notifications.length); // Set initial notification count
 
       } catch (error) {

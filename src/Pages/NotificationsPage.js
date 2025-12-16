@@ -23,7 +23,7 @@ const NotificationsPage = () => {
           `http://31.97.206.144:7021/api/vendor/notifications/${vendorId}`
         );
         if (response.data.notifications) {
-          setNotifications(response.data.notifications);
+          setNotifications(response.data.notifications.slice().reverse());
         }
       } catch (err) {
         setError("Error fetching notifications");

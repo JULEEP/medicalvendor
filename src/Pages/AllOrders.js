@@ -568,7 +568,7 @@ const AllOrders = () => {
                     <div className="text-sm font-semibold text-green-600">
                       {formatCurrency(
                         order.orderItems.reduce(
-                          (total, item) => total + (Number(item.price) || 0),
+                          (total, item) => total + (Number(item.price) || Number(item.medicineId.price) || 0),
                           0
                         )
                       )}
@@ -997,8 +997,11 @@ const AllOrders = () => {
                       </div>
                       <div className="text-right">
                         <div className="font-semibold text-gray-900">Quantity: {item.quantity}</div>
-                        {item.price && (
+                        {item.price ? (
                           <div className="text-sm text-gray-600">Price: {formatCurrency(item.price)}</div>
+                        ) : (
+                          <div className="text-sm text-gray-600">Price: {formatCurrency(item.medicineId.price)}
+                          </div>
                         )}
                       </div>
                     </div>
@@ -1035,7 +1038,7 @@ const AllOrders = () => {
                   {selectedOrder.orderItems.map((item) => (
                     <div key={item._id} className="flex justify-between text-sm text-gray-600">
                       <span>{item.name}</span>
-                      <span>{formatCurrency(item.price || 0)}</span>
+                      <span>{formatCurrency(item.price || item.medicineId.price || 0)}</span>
                     </div>
                   ))}
 
@@ -1046,7 +1049,7 @@ const AllOrders = () => {
                     <span className="text-green-600">
                       {formatCurrency(
                         selectedOrder.orderItems.reduce(
-                          (sum, item) => sum + (Number(item.price) || 0),
+                          (sum, item) => sum + (Number(item.price) || Number(item.medicineId.price) || 0),
                           0
                         )
                       )}
@@ -1199,7 +1202,7 @@ const AllOrders = () => {
                         <tr key={idx}>
                           <td className="border px-4 py-2">{item.name}</td>
                           <td className="border px-4 py-2 text-center">
-                            ₹{(Number(item.price) || 0).toFixed(2)}
+                            ₹{(Number(item.price) || Number(item.medicineId.price) || 0).toFixed(2)}
                           </td>
                         </tr>
                       ))}
@@ -1214,7 +1217,7 @@ const AllOrders = () => {
                       <td className="border px-4 py-2 text-center font-semibold text-green-600">
                         ₹{selectedOrder.orderItems
                           .filter(item => item.medicineId)
-                          .reduce((total, item) => total + (Number(item.price) || 0), 0)
+                          .reduce((total, item) => total + (Number(item.price) || Number(item.medicineId.price) || 0), 0)
                           .toFixed(2)}
                       </td>
                     </tr>
