@@ -609,7 +609,7 @@ const AllOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                      {order.status}
+                      {order.pharmacyResponse}
                     </span>
                     {order.assignedRider && (
                       <div className={`text-xs mt-1 ${getRiderStatusColor(order.assignedRiderStatus)}`}>
@@ -841,7 +841,7 @@ const AllOrders = () => {
                     </div>
                     <div className="flex justify-between items-center py-2 border-b border-gray-200">
                       <span className="text-gray-600">User ID</span>
-                      <span className="font-medium text-gray-900">{selectedOrder.userId}</span>
+                      <span className="font-medium text-gray-900">{selectedOrder.userId?._id}</span>
                     </div>
                   </div>
                 </div>
@@ -911,10 +911,10 @@ const AllOrders = () => {
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="flex items-center space-x-4">
-                      {selectedOrder.assignedRider.profileImage ? (
+                      {selectedOrder.assignedRider?.profileImage ? (
                         <img
-                          src={selectedOrder.assignedRider.profileImage}
-                          alt={selectedOrder.assignedRider.name}
+                          src={selectedOrder.assignedRider?.profileImage}
+                          alt={selectedOrder.assignedRider?.name}
                           className="h-16 w-16 rounded-full object-cover"
                         />
                       ) : (
@@ -923,10 +923,10 @@ const AllOrders = () => {
                         </div>
                       )}
                       <div>
-                        <div className="font-medium text-gray-900">{selectedOrder.assignedRider.name}</div>
-                        <div className="text-sm text-gray-500">Rider ID: {selectedOrder.assignedRider._id}</div>
-                        <div className={`text-sm font-medium mt-1 ${getRiderStatusColor(selectedOrder.assignedRiderStatus)}`}>
-                          Status: {selectedOrder.assignedRiderStatus}
+                        <div className="font-medium text-gray-900">{selectedOrder.assignedRider?.name}</div>
+                        <div className="text-sm text-gray-500">Rider ID: {selectedOrder.assignedRider?._id}</div>
+                        <div className={`text-sm font-medium mt-1 ${getRiderStatusColor(selectedOrder?.assignedRiderStatus)}`}>
+                          Status: {selectedOrder?.assignedRiderStatus}
                         </div>
                       </div>
                     </div>
@@ -936,19 +936,21 @@ const AllOrders = () => {
                           <FaEnvelope className="mr-2 text-blue-600" size={12} />
                           Email:
                         </span>
-                        <span className="font-medium text-gray-900">{selectedOrder.assignedRider.email}</span>
+                        <span className="font-medium text-gray-900">{selectedOrder.assignedRider?.email}</span>
                       </div>
                       <div className="flex justify-between items-center py-1">
                         <span className="text-gray-600 flex items-center">
                           <FaPhone className="mr-2 text-blue-600" size={12} />
                           Phone:
                         </span>
-                        <span className="font-medium text-gray-900">{selectedOrder.assignedRider.phone}</span>
+                        <span className="font-medium text-gray-900">{selectedOrder.assignedRider?.phone}</span>
                       </div>
                     </div>
                   </div>
                 </div>
               )}
+
+
 
               {/* Delivery Address */}
               {selectedOrder.deliveryAddress && (

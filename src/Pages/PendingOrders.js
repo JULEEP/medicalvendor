@@ -596,7 +596,7 @@ const PendingOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                      {order.status}
+                      {order.pharmacyResponse}
                     </span>
                     {order.assignedRider && (
                       <div className={`text-xs mt-1 ${getRiderStatusColor(order.assignedRiderStatus)}`}>
