@@ -108,6 +108,7 @@ import PrescriptionOrders from "./Pages/PrescriptionOrder.js";
 import CreateVendorQuery from "./Pages/CreateVendorQuery.js";
 import NotificationsPage from "./Pages/NotificationsPage.js";
 import MyVendorQueries from "./Pages/MyVendorQueries.js";
+import VendorWallet from "./Pages/VendorWallet.js";
 
 
 
@@ -229,6 +230,7 @@ function App() {
               <Route path="/addquery" element={<CreateVendorQuery />} />
               <Route path="/notifications" element={<NotificationsPage />} />
                <Route path="/myqueries" element={<MyVendorQueries />} />
+               <Route path="/mywallet" element={<VendorWallet />} />
 
 
 

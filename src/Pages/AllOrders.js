@@ -269,6 +269,24 @@ const AllOrders = () => {
     setCurrentPage(1);
   }, [searchQuery, startDate, endDate]);
 
+  // Calculate total amount for an order (price * quantity)
+  const calculateOrderTotal = (order) => {
+    if (!order || !order.orderItems) return 0;
+    
+    return order.orderItems.reduce((total, item) => {
+      const price = Number(item.price) || Number(item.medicineId?.price) || 0;
+      const quantity = Number(item.quantity) || 1;
+      return total + (price * quantity);
+    }, 0);
+  };
+
+  // Calculate item total (price * quantity) for a single item
+  const calculateItemTotal = (item) => {
+    const price = Number(item.price) || Number(item.medicineId?.price) || 0;
+    const quantity = Number(item.quantity) || 1;
+    return price * quantity;
+  };
+
   // Export the filtered orders as CSV
   const exportToCSV = () => {
     const header = ["Order ID", "User ID", "Items", "Total Amount", "Status", "Payment Method", "Rider", "Date"];
@@ -276,7 +294,7 @@ const AllOrders = () => {
       order._id,
       getUserIdLast4(order.userId),
       order.orderItems.filter(item => item.medicineId).map((med) => `${med.name} × ${med.quantity}`).join(", "),
-      `₹${order.totalAmount}`,
+      `₹${calculateOrderTotal(order).toFixed(2)}`,
       order.status,
       order.paymentMethod,
       order.assignedRider?.name || "Not Assigned",
@@ -566,12 +584,7 @@ const AllOrders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-green-600">
-                      {formatCurrency(
-                        order.orderItems.reduce(
-                          (total, item) => total + (Number(item.price) || Number(item.medicineId.price) || 0),
-                          0
-                        )
-                      )}
+                      {formatCurrency(calculateOrderTotal(order))}
                     </div>
 
                     {order.discountAmount > 0 && (
@@ -932,12 +945,6 @@ const AllOrders = () => {
                         </span>
                         <span className="font-medium text-gray-900">{selectedOrder.assignedRider.phone}</span>
                       </div>
-                      {/* <div className="flex justify-between items-center py-1">
-                        <span className="text-gray-600">Delivery Charge:</span>
-                        <span className="font-medium text-gray-900">
-                          {formatCurrency(selectedOrder.assignedRider.deliveryCharge || selectedOrder.deliveryCharge)}
-                        </span>
-                      </div> */}
                     </div>
                   </div>
                 </div>
@@ -991,15 +998,21 @@ const AllOrders = () => {
                     <div key={item._id} className="flex justify-between items-center p-4 bg-white rounded-lg border border-gray-200">
                       <div className="flex-1">
                         <div className="font-medium text-gray-900">{item.name}</div>
+                        <div className="text-sm text-gray-500 mt-1">
+                          Quantity: <span className="font-semibold">{item.quantity}</span> × 
+                          Price: <span className="font-semibold">{formatCurrency(item.price || item.medicineId?.price || 0)}</span>
+                        </div>
                         {item.medicineId && (
-                          <div className="text-sm text-gray-500 mt-1">Medicine ID: {item.medicineId._id}</div>
+                          <div className="text-sm text-gray-500">Medicine ID: {item.medicineId._id}</div>
                         )}
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold text-gray-900">Quantity: {item.quantity}</div>
-                        {item.medicineId && (
-                          <div className="text-sm text-gray-600">Price: {formatCurrency(item.medicineId.price)}</div>
-                        ) }
+                        <div className="font-semibold text-gray-900">
+                          {formatCurrency(calculateItemTotal(item))}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          ({item.quantity} × {formatCurrency(item.price || item.medicineId?.price || 0)})
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1013,29 +1026,10 @@ const AllOrders = () => {
                   Pricing Details
                 </h4>
                 <div className="space-y-3 max-w-md">
-                  {/* <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium text-gray-900">
-                      {formatCurrency((selectedOrder.totalAmount || 0) + (selectedOrder.discountAmount || 0) - (selectedOrder.deliveryCharge || 0) - (selectedOrder.platformCharge || 0))}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                    <span className="text-gray-600">Delivery Charge</span>
-                    <span className="font-medium text-gray-900">{formatCurrency(selectedOrder.deliveryCharge)}</span>
-                  </div>
-                  {selectedOrder.discountAmount > 0 && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="text-gray-600 flex items-center">
-                        <FaPercentage className="text-green-600 mr-1" size={12} />
-                        Discount ({selectedOrder.couponCode})
-                      </span>
-                      <span className="font-medium text-green-600">-{formatCurrency(selectedOrder.discountAmount)}</span>
-                    </div>
-                  )} */}
                   {selectedOrder.orderItems.map((item) => (
                     <div key={item._id} className="flex justify-between text-sm text-gray-600">
-                      <span>{item.name}</span>
-                      <span>{formatCurrency(item.price || item.medicineId.price || 0)}</span>
+                      <span>{item.name} (×{item.quantity})</span>
+                      <span>{formatCurrency(calculateItemTotal(item))}</span>
                     </div>
                   ))}
 
@@ -1044,21 +1038,28 @@ const AllOrders = () => {
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total Amount</span>
                     <span className="text-green-600">
-                      {formatCurrency(
-                        selectedOrder.orderItems.reduce(
-                          (sum, item) => sum + (Number(item.price) || Number(item.medicineId.price) || 0),
-                          0
-                        )
-                      )}
+                      {formatCurrency(calculateOrderTotal(selectedOrder))}
                     </span>
                   </div>
 
-                  {/* {selectedOrder.paymentMethod === 'Cash on Delivery' && (
+                  {selectedOrder.discountAmount > 0 && (
                     <div className="flex justify-between items-center py-2 border-t border-gray-200">
-                      <span className="text-gray-600">COD Amount Received</span>
-                      <span className="font-medium text-gray-900">{formatCurrency(selectedOrder.codAmountReceived)}</span>
+                      <span className="text-gray-600 flex items-center">
+                        <FaPercentage className="text-green-600 mr-1" size={12} />
+                        Discount ({selectedOrder.couponCode})
+                      </span>
+                      <span className="font-medium text-green-600">-{formatCurrency(selectedOrder.discountAmount)}</span>
                     </div>
-                  )} */}
+                  )}
+
+                  {selectedOrder.discountAmount > 0 && (
+                    <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-300">
+                      <span>Final Amount</span>
+                      <span className="text-green-600">
+                        {formatCurrency(calculateOrderTotal(selectedOrder) - (selectedOrder.discountAmount || 0))}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1190,6 +1191,8 @@ const AllOrders = () => {
                     <tr className="bg-gray-100">
                       <th className="border border-gray-300 px-4 py-2 text-left">Item Name</th>
                       <th className="border border-gray-300 px-4 py-2 text-center">Quantity</th>
+                      <th className="border border-gray-300 px-4 py-2 text-center">Price</th>
+                      <th className="border border-gray-300 px-4 py-2 text-center">Total</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1198,31 +1201,28 @@ const AllOrders = () => {
                       .map((item, idx) => (
                         <tr key={idx}>
                           <td className="border px-4 py-2">{item.name}</td>
+                          <td className="border px-4 py-2 text-center">{item.quantity}</td>
                           <td className="border px-4 py-2 text-center">
-                            ₹{(Number(item.price) || Number(item.medicineId.price) || 0).toFixed(2)}
+                            ₹{(Number(item.price) || Number(item.medicineId?.price) || 0).toFixed(2)}
+                          </td>
+                          <td className="border px-4 py-2 text-center">
+                            ₹{calculateItemTotal(item).toFixed(2)}
                           </td>
                         </tr>
                       ))}
                   </tbody>
-
-                  {/* ✅ FOOTER → ONCE */}
+                  
                   <tfoot>
                     <tr>
-                      <td className="border px-4 py-2 text-right font-semibold">
+                      <td colSpan="3" className="border px-4 py-2 text-right font-semibold">
                         Grand Total:
                       </td>
                       <td className="border px-4 py-2 text-center font-semibold text-green-600">
-                        ₹{selectedOrder.orderItems
-                          .filter(item => item.medicineId)
-                          .reduce((total, item) => total + (Number(item.price) || Number(item.medicineId.price) || 0), 0)
-                          .toFixed(2)}
+                        ₹{calculateOrderTotal(selectedOrder).toFixed(2)}
                       </td>
                     </tr>
                   </tfoot>
-
-
                 </table>
-
               </div>
             </div>
 
