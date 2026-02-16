@@ -132,6 +132,7 @@ const AllOrders = () => {
       }
 
       alert("Order status updated successfully!");
+      fetchOrders();
       closeStatusModal();
     } catch (err) {
       alert(err.message || "Failed to update status");
@@ -522,6 +523,9 @@ const AllOrders = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                S NO
+              </th>
+              <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Order Details
               </th>
               <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -546,8 +550,11 @@ const AllOrders = () => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {currentOrders.length > 0 ? (
-              currentOrders.map((order) => (
+              currentOrders.map((order, index) => (
                 <tr key={order._id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    { (currentPage - 1)*ordersPerPage + index + 1 }
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -608,7 +615,7 @@ const AllOrders = () => {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.pharmacyResponse)}`}>
                       {order.pharmacyResponse}
                     </span>
                     {order.assignedRider && (
