@@ -209,28 +209,28 @@ function App() {
               <Route path="/vendordocumentlist" element={<VendorDocumentList />} />
               <Route path="/redeemed-coupons" element={<RedeemedCouponsList />} />
               <Route path="/payment" element={<VendorInvoiceList />} />
-              <Route path="/rcvdpayment" element={< ReceivedPayments/>} />
-              <Route path="/allpayments" element={< AllPayments/>} />
+              <Route path="/rcvdpayment" element={< ReceivedPayments />} />
+              <Route path="/allpayments" element={< AllPayments />} />
               <Route path="/users/:id" element={<UserProfile />} />
               <Route path="/vendorprofile" element={<VendorProfile />} />
               <Route path="/category" element={<Category />} />
-               <Route path="/create-pharmacy" element={<CreatePharmacy />} />
-               <Route path="/pharmacylist" element={<PharmacyList />} />
-                 <Route path="/pharmacy/:pharmacyId" element={<PharmacyDetails />} />
-               <Route path="/add-medicine" element={<CreateMedicine />} />
+              <Route path="/create-pharmacy" element={<CreatePharmacy />} />
+              <Route path="/pharmacylist" element={<PharmacyList />} />
+              <Route path="/pharmacy/:pharmacyId" element={<PharmacyDetails />} />
+              <Route path="/add-medicine" element={<CreateMedicine />} />
               <Route path="/medicines" element={<AllMedicines />} />
               <Route path="/medicine/:medicineId" element={<SingleMedicine />} />
               <Route path="/orders" element={<AllOrders />} />
               <Route path="/pendingorders" element={<PendingOrders />} />
               <Route path="/deliveredorders" element={<DeliveredOrders />} />
               <Route path="/admin/orders/:orderId" element={<SingleOrder />} />
-               <Route path="/prescription" element={<PrescriptionsComponent />} />
-               <Route path="/priodicorders" element={<PeriodicOrders />} />
+              <Route path="/prescription" element={<PrescriptionsComponent />} />
+              <Route path="/priodicorders" element={<PeriodicOrders />} />
               <Route path="/prescriptionorders" element={<PrescriptionOrders />} />
               <Route path="/addquery" element={<CreateVendorQuery />} />
               <Route path="/notifications" element={<NotificationsPage />} />
-               <Route path="/myqueries" element={<MyVendorQueries />} />
-               <Route path="/mywallet" element={<VendorWallet />} />
+              <Route path="/myqueries" element={<MyVendorQueries />} />
+              <Route path="/mywallet" element={<VendorWallet />} />
 
 
 

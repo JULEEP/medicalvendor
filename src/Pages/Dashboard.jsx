@@ -421,7 +421,7 @@ const DashboardVendor = () => {
 
       {/* Quick Actions - Mobile Responsive */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-        <QuickActionButton label="Add New Medicine" route="/addmedicine" />
+        <QuickActionButton label="Add New Medicine" route="/add-medicine" />
         <QuickActionButton label="View Orders" route="/orders" />
         <QuickActionButton label="View Revenue" route="/orders" />
       </div>

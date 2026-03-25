@@ -114,7 +114,7 @@ const VendorProfile = () => {
         `http://31.97.206.144:7021/api/vendor/editbankdetails/${vendorId}/${bankDetailId}`,
         editedBankDetails
       );
-      
+
       console.log("Bank details updated: ", response.data);
       setVendor(response.data.vendor);
       setIsBankDetailsEditing(false);
@@ -126,25 +126,25 @@ const VendorProfile = () => {
 
 
   const handleFileChange = (e, field) => {
-  const file = e.target.files[0]; // Get the selected file
-  if (file) {
-    // Create a FormData object to handle file upload (if needed)
-    const formData = new FormData();
-    formData.append("file", file);
+    const file = e.target.files[0]; // Get the selected file
+    if (file) {
+      // Create a FormData object to handle file upload (if needed)
+      const formData = new FormData();
+      formData.append("file", file);
 
-    // Here you can implement your file upload logic, e.g., uploading to Cloudinary
-    // or another cloud service. After successful upload, get the URL of the file.
+      // Here you can implement your file upload logic, e.g., uploading to Cloudinary
+      // or another cloud service. After successful upload, get the URL of the file.
 
-    // For now, we'll simulate the file upload by setting a sample URL
-    const fileUrl = URL.createObjectURL(file); // Local URL for preview
+      // For now, we'll simulate the file upload by setting a sample URL
+      const fileUrl = URL.createObjectURL(file); // Local URL for preview
 
-    // Update the state with the file URL
-    setEditedVendor({
-      ...editedVendor,
-      [field]: fileUrl, // Dynamically update the respective field
-    });
-  }
-};
+      // Update the state with the file URL
+      setEditedVendor({
+        ...editedVendor,
+        [field]: fileUrl, // Dynamically update the respective field
+      });
+    }
+  };
 
 
   const resetBankDetailsForm = () => {
@@ -185,9 +185,8 @@ const VendorProfile = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Vendor Profile</h1>
         <div className="flex items-center space-x-4">
-          <span className={`px-3 py-1 rounded-full text-white ${
-            status === "Active" ? "bg-green-500" : "bg-red-500"
-          }`}>
+          <span className={`px-3 py-1 rounded-full text-white ${status === "Active" ? "bg-green-500" : "bg-red-500"
+            }`}>
             {status}
           </span>
           {/* <button
@@ -207,221 +206,220 @@ const VendorProfile = () => {
       <div className="flex space-x-4 mb-6">
         <button
           onClick={() => setIsEditing(!isEditing)}
-          className={`px-4 py-2 rounded ${
-            isEditing ? "bg-gray-500 hover:bg-gray-600" : "bg-blue-500 hover:bg-blue-600"
-          } text-white`}
+          className={`px-4 py-2 rounded ${isEditing ? "bg-gray-500 hover:bg-gray-600" : "bg-blue-500 hover:bg-blue-600"
+            } text-white`}
         >
           {isEditing ? "Cancel Edit" : "Edit Profile"}
         </button>
-        
-        {(!vendor.bankDetails || vendor.bankDetails.length === 0) && !isBankDetailsEditing && (
+
+        {/* {(!vendor.bankDetails || vendor.bankDetails.length === 0) && !isBankDetailsEditing && (
           <button
             onClick={() => setShowBankModal(true)}
             className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded"
           >
             Add Bank Details
           </button>
-        )}
+        )} */}
       </div>
 
-<div className="mb-6">
-  <h2 className="text-2xl font-semibold mb-4">Vendor Information</h2>
-  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-    {/* Vendor Name */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">Vendor Name</label>
-      {isEditing ? (
-        <input
-          type="text"
-          value={editedVendor.vendorName || ""}
-          onChange={(e) =>
-            setEditedVendor({ ...editedVendor, vendorName: e.target.value })
-          }
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <p className="p-2">{vendor.vendorName}</p>
-      )}
-    </div>
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold mb-4">Vendor Information</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Vendor Name */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">Vendor Name</label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={editedVendor.vendorName || ""}
+                onChange={(e) =>
+                  setEditedVendor({ ...editedVendor, vendorName: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <p className="p-2">{vendor.vendorName}</p>
+            )}
+          </div>
 
-    {/* Vendor Email */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">Vendor Email</label>
-      {isEditing ? (
-        <input
-          type="email"
-          value={editedVendor.vendorEmail || ""}
-          onChange={(e) =>
-            setEditedVendor({ ...editedVendor, vendorEmail: e.target.value })
-          }
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <p className="p-2">{vendor.vendorEmail}</p>
-      )}
-    </div>
+          {/* Vendor Email */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">Vendor Email</label>
+            {isEditing ? (
+              <input
+                type="email"
+                value={editedVendor.vendorEmail || ""}
+                onChange={(e) =>
+                  setEditedVendor({ ...editedVendor, vendorEmail: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <p className="p-2">{vendor.vendorEmail}</p>
+            )}
+          </div>
 
-    {/* Vendor Phone */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">Vendor Phone</label>
-      {isEditing ? (
-        <input
-          type="tel"
-          value={editedVendor.vendorPhone || ""}
-          onChange={(e) =>
-            setEditedVendor({ ...editedVendor, vendorPhone: e.target.value })
-          }
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <p className="p-2">{vendor.vendorPhone}</p>
-      )}
-    </div>
+          {/* Vendor Phone */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">Vendor Phone</label>
+            {isEditing ? (
+              <input
+                type="tel"
+                value={editedVendor.vendorPhone || ""}
+                onChange={(e) =>
+                  setEditedVendor({ ...editedVendor, vendorPhone: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <p className="p-2">{vendor.vendorPhone}</p>
+            )}
+          </div>
 
-    {/* Pharmacy Name */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">Pharmacy Name</label>
-      {isEditing ? (
-        <input
-          type="text"
-          value={editedVendor.name || ""}
-          onChange={(e) => setEditedVendor({ ...editedVendor, name: e.target.value })}
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <p className="p-2">{vendor.name}</p>
-      )}
-    </div>
+          {/* Pharmacy Name */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">Pharmacy Name</label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={editedVendor.name || ""}
+                onChange={(e) => setEditedVendor({ ...editedVendor, name: e.target.value })}
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <p className="p-2">{vendor.name}</p>
+            )}
+          </div>
 
-    {/* Pharmacy Address */}
-    <div className="border rounded-lg p-4 md:col-span-2">
-      <label className="block font-semibold mb-2">Pharmacy Address</label>
-      {isEditing ? (
-        <textarea
-          value={editedVendor.address || ""}
-          onChange={(e) => setEditedVendor({ ...editedVendor, address: e.target.value })}
-          className="w-full p-2 border rounded"
-          rows="3"
-        />
-      ) : (
-        <p className="p-2">{vendor.address}</p>
-      )}
-    </div>
+          {/* Pharmacy Address */}
+          <div className="border rounded-lg p-4 md:col-span-2">
+            <label className="block font-semibold mb-2">Pharmacy Address</label>
+            {isEditing ? (
+              <textarea
+                value={editedVendor.address || ""}
+                onChange={(e) => setEditedVendor({ ...editedVendor, address: e.target.value })}
+                className="w-full p-2 border rounded"
+                rows="3"
+              />
+            ) : (
+              <p className="p-2">{vendor.address}</p>
+            )}
+          </div>
 
-    {/* Aadhar */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">Aadhar</label>
-      {isEditing ? (
-        <input
-          type="text"
-          value={editedVendor.aadhar || ""}
-          onChange={(e) =>
-            setEditedVendor({ ...editedVendor, aadhar: e.target.value })
-          }
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <p className="p-2">{vendor.aadhar}</p>
-      )}
-    </div>
+          {/* Aadhar */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">Aadhar</label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={editedVendor.aadhar || ""}
+                onChange={(e) =>
+                  setEditedVendor({ ...editedVendor, aadhar: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <p className="p-2">{vendor.aadhar}</p>
+            )}
+          </div>
 
-    {/* PAN Card */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">PAN Card</label>
-      {isEditing ? (
-        <input
-          type="text"
-          value={editedVendor.panCard || ""}
-          onChange={(e) =>
-            setEditedVendor({ ...editedVendor, panCard: e.target.value })
-          }
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <p className="p-2">{vendor.panCard}</p>
-      )}
-    </div>
+          {/* PAN Card */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">PAN Card</label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={editedVendor.panCard || ""}
+                onChange={(e) =>
+                  setEditedVendor({ ...editedVendor, panCard: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <p className="p-2">{vendor.panCard}</p>
+            )}
+          </div>
 
-    {/* License */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">License</label>
-      {isEditing ? (
-        <input
-          type="text"
-          value={editedVendor.license || ""}
-          onChange={(e) =>
-            setEditedVendor({ ...editedVendor, license: e.target.value })
-          }
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <p className="p-2">{vendor.license}</p>
-      )}
-    </div>
+          {/* License */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">License</label>
+            {isEditing ? (
+              <input
+                type="text"
+                value={editedVendor.license || ""}
+                onChange={(e) =>
+                  setEditedVendor({ ...editedVendor, license: e.target.value })
+                }
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <p className="p-2">{vendor.license}</p>
+            )}
+          </div>
 
-    {/* Aadhar File */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">Aadhar File</label>
-      {isEditing ? (
-        <input
-          type="file"
-          onChange={(e) => handleFileChange(e, 'aadharFile')}
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <a
-          href={vendor.aadharFile}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500"
-        >
-          View Aadhar File
-        </a>
-      )}
-    </div>
+          {/* Aadhar File */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">Aadhar File</label>
+            {isEditing ? (
+              <input
+                type="file"
+                onChange={(e) => handleFileChange(e, 'aadharFile')}
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <a
+                href={vendor.aadharFile}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500"
+              >
+                View Aadhar File
+              </a>
+            )}
+          </div>
 
-    {/* PAN Card File */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">PAN Card File</label>
-      {isEditing ? (
-        <input
-          type="file"
-          onChange={(e) => handleFileChange(e, 'panCardFile')}
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <a
-          href={vendor.panCardFile}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500"
-        >
-          View PAN Card File
-        </a>
-      )}
-    </div>
+          {/* PAN Card File */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">PAN Card File</label>
+            {isEditing ? (
+              <input
+                type="file"
+                onChange={(e) => handleFileChange(e, 'panCardFile')}
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <a
+                href={vendor.panCardFile}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500"
+              >
+                View PAN Card File
+              </a>
+            )}
+          </div>
 
-    {/* License File */}
-    <div className="border rounded-lg p-4">
-      <label className="block font-semibold mb-2">License File</label>
-      {isEditing ? (
-        <input
-          type="file"
-          onChange={(e) => handleFileChange(e, 'licenseFile')}
-          className="w-full p-2 border rounded"
-        />
-      ) : (
-        <a
-          href={vendor.licenseFile}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-500"
-        >
-          View License File
-        </a>
-      )}
-    </div>
-  </div>
+          {/* License File */}
+          <div className="border rounded-lg p-4">
+            <label className="block font-semibold mb-2">License File</label>
+            {isEditing ? (
+              <input
+                type="file"
+                onChange={(e) => handleFileChange(e, 'licenseFile')}
+                className="w-full p-2 border rounded"
+              />
+            ) : (
+              <a
+                href={vendor.licenseFile}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-500"
+              >
+                View License File
+              </a>
+            )}
+          </div>
+        </div>
 
 
         {/* Save Button for Profile Edit */}
@@ -444,7 +442,7 @@ const VendorProfile = () => {
       </div>
 
       {/* Bank Details Section */}
-      <div className="mb-6">
+      {/* <div className="mb-6">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-semibold">Bank Details</h2>
           {vendor.bankDetails && vendor.bankDetails.length > 0 && !isBankDetailsEditing && (
@@ -480,10 +478,17 @@ const VendorProfile = () => {
                   <label className="block font-semibold mb-2">Account Number</label>
                   <input
                     type="text"
-                    value={editedBankDetails.accountNumber || ""}
-                    onChange={(e) =>
-                      setEditedBankDetails({ ...editedBankDetails, accountNumber: e.target.value })
-                    }
+                    placeholder="Account Number"
+                    value={editedBankDetails.accountNumber}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ""); // remove non-digits
+                      setEditedBankDetails({
+                        ...editedBankDetails,
+                        accountNumber: value,
+                      });
+                    }}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     className="w-full p-2 border rounded"
                   />
                 </div>
@@ -570,7 +575,7 @@ const VendorProfile = () => {
             </button>
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* Modal to Add Bank Details */}
       {showBankModal && (
@@ -596,9 +601,15 @@ const VendorProfile = () => {
                   type="text"
                   placeholder="Account Number"
                   value={editedBankDetails.accountNumber}
-                  onChange={(e) =>
-                    setEditedBankDetails({ ...editedBankDetails, accountNumber: e.target.value })
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ""); // remove non-digits
+                    setEditedBankDetails({
+                      ...editedBankDetails,
+                      accountNumber: value,
+                    });
+                  }}
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   className="w-full p-2 border rounded"
                 />
               </div>

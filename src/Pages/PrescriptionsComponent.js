@@ -282,7 +282,7 @@ const PrescriptionsComponent = () => {
       console.log("Creating order with payload:", payload);
 
       const response = await axios.post(
-        `http://31.97.206.144:7021/api/vendor/createOrderFromPrescription/${vendorId}/${selectedPrescription.userId.userid || selectedPrescription.userId._id || selectedPrescription.userId}`,
+        `http://31.97.206.144:7021/api/vendor/createOrderFromPrescription/${selectedPrescription.prescriptionId}/${vendorId}/${selectedPrescription.userId.userid || selectedPrescription.userId._id || selectedPrescription.userId}`,
         payload
       );
 

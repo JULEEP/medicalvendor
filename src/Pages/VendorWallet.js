@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { 
   FaEye, 
   FaEdit, 
@@ -27,6 +27,668 @@ import {
   FaExclamationTriangle
 } from "react-icons/fa";
 
+// Modal components defined outside to prevent re-renders
+const ViewAccountModal = ({ isOpen, account, onClose }) => {
+  if (!isOpen || !account) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center">
+              <FaEye className="mr-2 text-blue-600" />
+              Account Details
+            </h3>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <FaTimesCircle className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+              <div>
+                <p className="text-sm text-gray-600">Bank Name</p>
+                <p className="font-medium">{account.bankName}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <FaUser className="text-gray-600" />
+              <div>
+                <p className="text-sm text-gray-600">Account Holder</p>
+                <p className="font-medium">{account.accountHolderName}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <FaIdCard className="text-gray-600" />
+              <div>
+                <p className="text-sm text-gray-600">Account Number</p>
+                <p className="font-mono font-medium">****{account.accountNumber?.slice(-4)}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <FaQrcode className="text-gray-600" />
+              <div>
+                <p className="text-sm text-gray-600">IFSC Code</p>
+                <p className="font-mono font-medium">{account.ifscCode}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <FaBuilding className="text-gray-600" />
+              <div>
+                <p className="text-sm text-gray-600">Account Type</p>
+                <p className="font-medium capitalize">{account.accountType}</p>
+              </div>
+            </div>
+
+            {account.branchName && (
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                <FaMapMarkerAlt className="text-gray-600" />
+                <div>
+                  <p className="text-sm text-gray-600">Branch Name</p>
+                  <p className="font-medium">{account.branchName}</p>
+                </div>
+              </div>
+            )}
+
+            {account.upiId && (
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                <FaCreditCard className="text-gray-600" />
+                <div>
+                  <p className="text-sm text-gray-600">UPI ID</p>
+                  <p className="font-medium">{account.upiId}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4 mt-6">
+              <div className={`p-3 rounded-lg ${account.isDefault ? 'bg-green-100 border border-green-200' : 'bg-gray-100'}`}>
+                <p className="text-sm text-gray-600">Default Account</p>
+                <div className="flex items-center mt-1">
+                  {account.isDefault ? (
+                    <>
+                      <FaCheckCircle className="text-green-600 mr-2" />
+                      <span className="text-green-700 font-medium">Yes</span>
+                    </>
+                  ) : (
+                    <span className="text-gray-700 font-medium">No</span>
+                  )}
+                </div>
+              </div>
+
+              <div className={`p-3 rounded-lg ${account.status === 'active' ? 'bg-green-100 border border-green-200' : 'bg-yellow-100'}`}>
+                <p className="text-sm text-gray-600">Status</p>
+                <p className={`font-medium capitalize ${account.status === 'active' ? 'text-green-700' : 'text-yellow-700'}`}>
+                  {account.status}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <button onClick={onClose} className="w-full mt-6 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const EditAccountModal = ({ isOpen, account, onClose, onUpdate, loading }) => {
+  const [formData, setFormData] = useState({
+    upi: "",
+    bankName: "",
+    accountNumber: "",
+    ifscCode: "",
+    accountHolderName: "",
+    accountType: "savings",
+    branchName: ""
+  });
+
+  useEffect(() => {
+    if (account) {
+      setFormData({
+        upi: account.upiId || "",
+        bankName: account.bankName || "",
+        accountNumber: account.accountNumber || "",
+        ifscCode: account.ifscCode || "",
+        accountHolderName: account.accountHolderName || "",
+        accountType: account.accountType || "savings",
+        branchName: account.branchName || ""
+      });
+    }
+  }, [account]);
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    onUpdate(formData);
+  };
+
+  if (!isOpen || !account) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center">
+              <FaEdit className="mr-2 text-blue-600" />
+              Edit Account
+            </h3>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <FaTimesCircle className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <FaUser className="mr-2" />
+                Account Holder Name *
+              </label>
+              <input
+                type="text"
+                value={formData.accountHolderName}
+                onChange={(e) => handleChange('accountHolderName', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter full name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                Bank Name *
+              </label>
+              <input
+                type="text"
+                value={formData.bankName}
+                onChange={(e) => handleChange('bankName', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter bank name"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Account Number *
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={formData.accountNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    handleChange('accountNumber', value);
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="1234567890"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Account Type *
+                </label>
+                <select
+                  value={formData.accountType}
+                  onChange={(e) => handleChange('accountType', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="savings">Savings</option>
+                  <option value="current">Current</option>
+                  <option value="salary">Salary</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <FaQrcode className="mr-2" />
+                IFSC Code *
+              </label>
+              <input
+                type="text"
+                value={formData.ifscCode}
+                onChange={(e) => handleChange('ifscCode', e.target.value.toUpperCase())}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="SBIN0001234"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <FaMapMarkerAlt className="mr-2" />
+                Branch Name
+              </label>
+              <input
+                type="text"
+                value={formData.branchName}
+                onChange={(e) => handleChange('branchName', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter branch name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <FaCreditCard className="mr-2" />
+                UPI ID (Optional)
+              </label>
+              <input
+                type="text"
+                value={formData.upi}
+                onChange={(e) => handleChange('upi', e.target.value.toLowerCase())}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="username@upi"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading || !formData.bankName || !formData.accountNumber || !formData.ifscCode || !formData.accountHolderName}
+              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Updating...
+                </>
+              ) : (
+                <>
+                  <FaCheckCircle className="mr-2" />
+                  Update Account
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AddAccountModal = ({ isOpen, onClose, onAdd, loading }) => {
+  const [formData, setFormData] = useState({
+    upi: "",
+    bankName: "",
+    accountNumber: "",
+    ifscCode: "",
+    accountHolderName: "",
+    accountType: "savings",
+    branchName: ""
+  });
+
+  const resetForm = () => {
+    setFormData({
+      upi: "",
+      bankName: "",
+      accountNumber: "",
+      ifscCode: "",
+      accountHolderName: "",
+      accountType: "savings",
+      branchName: ""
+    });
+  };
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = () => {
+    onAdd(formData);
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center">
+              <FaPlusCircle className="mr-2 text-green-600" />
+              Add Bank Account
+            </h3>
+            <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">
+              <FaTimesCircle className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <FaUser className="mr-2" />
+                Account Holder Name *
+              </label>
+              <input
+                type="text"
+                value={formData.accountHolderName}
+                onChange={(e) => handleChange('accountHolderName', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter full name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                Bank Name *
+              </label>
+              <input
+                type="text"
+                value={formData.bankName}
+                onChange={(e) => handleChange('bankName', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter bank name"
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Account Number *
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={formData.accountNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    handleChange('accountNumber', value);
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="1234567890"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Account Type *
+                </label>
+                <select
+                  value={formData.accountType}
+                  onChange={(e) => handleChange('accountType', e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="savings">Savings</option>
+                  <option value="current">Current</option>
+                  <option value="salary">Salary</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <FaQrcode className="mr-2" />
+                IFSC Code *
+              </label>
+              <input
+                type="text"
+                value={formData.ifscCode}
+                onChange={(e) => handleChange('ifscCode', e.target.value.toUpperCase())}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="SBIN0001234"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <FaMapMarkerAlt className="mr-2" />
+                Branch Name
+              </label>
+              <input
+                type="text"
+                value={formData.branchName}
+                onChange={(e) => handleChange('branchName', e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter branch name"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                <FaCreditCard className="mr-2" />
+                UPI ID (Optional)
+              </label>
+              <input
+                type="text"
+                value={formData.upi}
+                onChange={(e) => handleChange('upi', e.target.value.toLowerCase())}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="username@upi"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
+            <button
+              onClick={handleClose}
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading || !formData.bankName || !formData.accountNumber || !formData.ifscCode || !formData.accountHolderName}
+              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Adding...
+                </>
+              ) : (
+                <>
+                  <FaCheckCircle className="mr-2" />
+                  Add Account
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const WithdrawalModal = ({ isOpen, onClose, onSubmit, balance, savedAccounts, selectedAccount, setSelectedAccount, loading }) => {
+  const [amount, setAmount] = useState("");
+
+  const handleAmountChange = (e) => {
+    const value = e.target.value;
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setAmount(value);
+    }
+  };
+
+  const handleSubmit = () => {
+    onSubmit(amount);
+  };
+
+  const handleClose = () => {
+    setAmount("");
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-bold text-gray-800 flex items-center">
+              <FaMoneyBillWave className="mr-2 text-blue-600" />
+              Withdraw Funds
+            </h3>
+            <button onClick={handleClose} className="text-gray-500 hover:text-gray-700">
+              <FaTimesCircle className="w-6 h-6" />
+            </button>
+          </div>
+
+          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Available Balance:</span>
+              <span className="text-xl font-bold text-blue-600 flex items-center">
+                <FaRupeeSign className="mr-1" />
+                {new Intl.NumberFormat('en-IN', {
+                  style: 'currency',
+                  currency: 'INR',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2
+                }).format(balance)}
+              </span>
+            </div>
+          </div>
+
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Amount to Withdraw (₹)
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <FaRupeeSign className="text-gray-500" />
+              </div>
+              <input
+                type="text"
+                inputMode="decimal"
+                value={amount}
+                onChange={handleAmountChange}
+                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="0.00"
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Minimum withdrawal: ₹100 | Maximum: {new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 0
+              }).format(balance)}
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Select Account *
+              </label>
+            </div>
+
+            {savedAccounts.length === 0 ? (
+              <div className="text-center py-4 border-2 border-dashed border-gray-300 rounded-lg">
+                <p className="text-gray-500 mb-2">No bank accounts saved</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {savedAccounts.map((account) => (
+                  <div key={account._id} className="flex items-start">
+                    <input
+                      type="radio"
+                      id={`withdrawal-account-${account._id}`}
+                      name="withdrawalAccount"
+                      checked={selectedAccount === account._id}
+                      onChange={() => setSelectedAccount(account._id)}
+                      className="mt-1 mr-3"
+                    />
+                    <label htmlFor={`withdrawal-account-${account._id}`} className="flex-1 cursor-pointer">
+                      <div className={`p-3 rounded-lg border ${selectedAccount === account._id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1 min-w-0">
+                            <span className="font-medium truncate block">{account.bankName}</span>
+                            <p className="text-sm text-gray-600 mt-1 truncate">
+                              ****{account.accountNumber?.slice(-4)} • {account.accountHolderName}
+                            </p>
+                          </div>
+                          {account.isDefault && (
+                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex items-center ml-2 flex-shrink-0">
+                              <FaCheckCircle className="mr-1" />
+                              Default
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+            <button
+              onClick={handleClose}
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={loading || !amount || parseFloat(amount) < 100 || parseFloat(amount) > balance || !selectedAccount}
+              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {loading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <FaMoneyBillWave className="mr-2" />
+                  Confirm Withdrawal
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center">
+            <FaTrash className="mr-2 text-red-600" />
+            Delete Account
+          </h3>
+          <p className="text-gray-600">Are you sure you want to delete this bank account? This action cannot be undone.</p>
+        </div>
+        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
+          >
+            <FaTrash className="mr-2" />
+            Delete Account
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function VendorWallet() {
   const [walletData, setWalletData] = useState({
     walletBalance: 0,
@@ -44,30 +706,11 @@ export default function VendorWallet() {
   const [showEditAccountPopup, setShowEditAccountPopup] = useState(false);
   const [selectedAccountForView, setSelectedAccountForView] = useState(null);
   const [selectedAccountForEdit, setSelectedAccountForEdit] = useState(null);
-  const [accountDetails, setAccountDetails] = useState({
-    upi: "",
-    bankName: "",
-    accountNumber: "",
-    ifscCode: "",
-    accountHolderName: "",
-    accountType: "savings",
-    branchName: ""
-  });
-  const [editAccountDetails, setEditAccountDetails] = useState({
-    upi: "",
-    bankName: "",
-    accountNumber: "",
-    ifscCode: "",
-    accountHolderName: "",
-    accountType: "savings",
-    branchName: ""
-  });
   const [accountLoading, setAccountLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
   
   // Withdrawal states
   const [showWithdrawalPopup, setShowWithdrawalPopup] = useState(false);
-  const [withdrawalAmount, setWithdrawalAmount] = useState("");
   const [selectedAccount, setSelectedAccount] = useState("");
   const [withdrawalRequests, setWithdrawalRequests] = useState([]);
   const [savedAccounts, setSavedAccounts] = useState([]);
@@ -128,7 +771,7 @@ export default function VendorWallet() {
       if (response.ok) {
         const accounts = data.accounts || [];
         setSavedAccounts(accounts);
-        if (accounts.length > 0) {
+        if (accounts.length > 0 && !selectedAccount) {
           setSelectedAccount(accounts[0]._id);
         }
       }
@@ -159,21 +802,12 @@ export default function VendorWallet() {
   // Edit account
   const editAccount = (account) => {
     setSelectedAccountForEdit(account);
-    setEditAccountDetails({
-      upi: account.upiId || "",
-      bankName: account.bankName || "",
-      accountNumber: account.accountNumber || "",
-      ifscCode: account.ifscCode || "",
-      accountHolderName: account.accountHolderName || "",
-      accountType: account.accountType || "savings",
-      branchName: account.branchName || ""
-    });
     setShowEditAccountPopup(true);
   };
 
   // Update account
-  const updateBankAccount = async () => {
-    if (!editAccountDetails.bankName || !editAccountDetails.accountNumber || !editAccountDetails.ifscCode || !editAccountDetails.accountHolderName) {
+  const updateBankAccount = async (formData) => {
+    if (!formData.bankName || !formData.accountNumber || !formData.ifscCode || !formData.accountHolderName) {
       alert("Please fill all required account details");
       return;
     }
@@ -187,13 +821,13 @@ export default function VendorWallet() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          accountHolderName: editAccountDetails.accountHolderName,
-          bankName: editAccountDetails.bankName,
-          accountNumber: editAccountDetails.accountNumber,
-          ifscCode: editAccountDetails.ifscCode.toUpperCase(),
-          accountType: editAccountDetails.accountType,
-          upiId: editAccountDetails.upi,
-          branchName: editAccountDetails.branchName
+          accountHolderName: formData.accountHolderName,
+          bankName: formData.bankName,
+          accountNumber: formData.accountNumber,
+          ifscCode: formData.ifscCode.toUpperCase(),
+          accountType: formData.accountType,
+          upiId: formData.upi,
+          branchName: formData.branchName
         })
       });
       const data = await response.json();
@@ -213,8 +847,8 @@ export default function VendorWallet() {
     }
   };
 
-  const addBankAccount = async () => {
-    if (!accountDetails.bankName || !accountDetails.accountNumber || !accountDetails.ifscCode || !accountDetails.accountHolderName) {
+  const addBankAccount = async (formData) => {
+    if (!formData.bankName || !formData.accountNumber || !formData.ifscCode || !formData.accountHolderName) {
       alert("Please fill all required account details");
       return;
     }
@@ -228,13 +862,13 @@ export default function VendorWallet() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          accountHolderName: accountDetails.accountHolderName,
-          bankName: accountDetails.bankName,
-          accountNumber: accountDetails.accountNumber,
-          ifscCode: accountDetails.ifscCode.toUpperCase(),
-          accountType: accountDetails.accountType,
-          upiId: accountDetails.upi,
-          branchName: accountDetails.branchName,
+          accountHolderName: formData.accountHolderName,
+          bankName: formData.bankName,
+          accountNumber: formData.accountNumber,
+          ifscCode: formData.ifscCode.toUpperCase(),
+          accountType: formData.accountType,
+          upiId: formData.upi,
+          branchName: formData.branchName,
           isDefault: savedAccounts.length === 0
         })
       });
@@ -248,8 +882,6 @@ export default function VendorWallet() {
       alert("Account added successfully!");
       await fetchSavedAccounts();
       setShowAddAccountPopup(false);
-      resetAccountForm();
-
     } catch (err) {
       alert(err.message || "An error occurred");
     } finally {
@@ -277,57 +909,19 @@ export default function VendorWallet() {
     }
   };
 
-  // Set default account
-  const setDefaultAccount = async (accountId) => {
-    try {
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/accounts/${vendorId}/${accountId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          isDefault: true
-        })
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to set default account");
-      }
-
-      alert("Default account updated!");
-      await fetchSavedAccounts();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
-  // Reset account form
-  const resetAccountForm = () => {
-    setAccountDetails({
-      upi: "",
-      bankName: "",
-      accountNumber: "",
-      ifscCode: "",
-      accountHolderName: "",
-      accountType: "savings",
-      branchName: ""
-    });
-  };
-
   // Handle withdrawal submission
-  const handleWithdrawalSubmit = async () => {
-    if (!withdrawalAmount || isNaN(withdrawalAmount) || parseFloat(withdrawalAmount) <= 0) {
+  const handleWithdrawalSubmit = async (amount) => {
+    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
       alert("Please enter a valid amount");
       return;
     }
 
-    if (parseFloat(withdrawalAmount) < 100) {
+    if (parseFloat(amount) < 100) {
       alert("Minimum withdrawal amount is ₹100");
       return;
     }
 
-    if (parseFloat(withdrawalAmount) > walletData.walletBalance) {
+    if (parseFloat(amount) > walletData.walletBalance) {
       alert("Insufficient balance");
       return;
     }
@@ -353,7 +947,7 @@ export default function VendorWallet() {
         },
         body: JSON.stringify({
           vendorId,
-          amount: parseFloat(withdrawalAmount),
+          amount: parseFloat(amount),
           accountId: selectedAccount,
           paymentMethod: 'bank_transfer'
         })
@@ -372,36 +966,11 @@ export default function VendorWallet() {
         fetchWithdrawalRequests()
       ]);
       
-      setWithdrawalAmount("");
       setShowWithdrawalPopup(false);
     } catch (err) {
       alert(err.message || "An error occurred");
     } finally {
       setWithdrawalLoading(false);
-    }
-  };
-
-  // Cancel withdrawal request
-  const cancelWithdrawalRequest = async (requestId) => {
-    if (!window.confirm("Are you sure you want to cancel this withdrawal request?")) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/withdrawals/cancel/${vendorId}/${requestId}`, {
-        method: "PUT"
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to cancel withdrawal");
-      }
-
-      alert("Withdrawal request cancelled successfully!");
-      await fetchWithdrawalRequests();
-      await fetchWalletData();
-    } catch (err) {
-      alert(err.message);
     }
   };
 
@@ -540,640 +1109,47 @@ export default function VendorWallet() {
     </div>
   );
 
-  // Account Detail Modal Components
-  const ViewAccountModal = () => {
-    if (!selectedAccountForView) return null;
-    
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                <FaEye className="mr-2 text-blue-600" />
-                Account Details
-              </h3>
-              <button 
-                onClick={() => {
-                  setShowViewAccountPopup(false);
-                  setSelectedAccountForView(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <FaTimesCircle className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
-                <div>
-                  <p className="text-sm text-gray-600">Bank Name</p>
-                  <p className="font-medium">{selectedAccountForView.bankName}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                <FaUser className="text-gray-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Account Holder</p>
-                  <p className="font-medium">{selectedAccountForView.accountHolderName}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                <FaIdCard className="text-gray-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Account Number</p>
-                  <p className="font-mono font-medium">****{selectedAccountForView.accountNumber?.slice(-4)}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                <FaQrcode className="text-gray-600" />
-                <div>
-                  <p className="text-sm text-gray-600">IFSC Code</p>
-                  <p className="font-mono font-medium">{selectedAccountForView.ifscCode}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                <FaBuilding className="text-gray-600" />
-                <div>
-                  <p className="text-sm text-gray-600">Account Type</p>
-                  <p className="font-medium capitalize">{selectedAccountForView.accountType}</p>
-                </div>
-              </div>
-
-              {selectedAccountForView.branchName && (
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <FaMapMarkerAlt className="text-gray-600" />
-                  <div>
-                    <p className="text-sm text-gray-600">Branch Name</p>
-                    <p className="font-medium">{selectedAccountForView.branchName}</p>
-                  </div>
-                </div>
-              )}
-
-              {selectedAccountForView.upiId && (
-                <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                  <FaCreditCard className="text-gray-600" />
-                  <div>
-                    <p className="text-sm text-gray-600">UPI ID</p>
-                    <p className="font-medium">{selectedAccountForView.upiId}</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="grid grid-cols-2 gap-4 mt-6">
-                <div className={`p-3 rounded-lg ${selectedAccountForView.isDefault ? 'bg-green-100 border border-green-200' : 'bg-gray-100'}`}>
-                  <p className="text-sm text-gray-600">Default Account</p>
-                  <div className="flex items-center mt-1">
-                    {selectedAccountForView.isDefault ? (
-                      <>
-                        <FaCheckCircle className="text-green-600 mr-2" />
-                        <span className="text-green-700 font-medium">Yes</span>
-                      </>
-                    ) : (
-                      <span className="text-gray-700 font-medium">No</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className={`p-3 rounded-lg ${selectedAccountForView.status === 'active' ? 'bg-green-100 border border-green-200' : 'bg-yellow-100'}`}>
-                  <p className="text-sm text-gray-600">Status</p>
-                  <p className={`font-medium capitalize ${selectedAccountForView.status === 'active' ? 'text-green-700' : 'text-yellow-700'}`}>
-                    {selectedAccountForView.status}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                setShowViewAccountPopup(false);
-                setSelectedAccountForView(null);
-              }}
-              className="w-full mt-6 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const EditAccountModal = () => {
-    if (!selectedAccountForEdit) return null;
-    
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-          <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-gray-800 flex items-center">
-                <FaEdit className="mr-2 text-blue-600" />
-                Edit Account
-              </h3>
-              <button 
-                onClick={() => {
-                  setShowEditAccountPopup(false);
-                  setSelectedAccountForEdit(null);
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <FaTimesCircle className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                  <FaUser className="mr-2" />
-                  Account Holder Name *
-                </label>
-                <input
-                  type="text"
-                  value={editAccountDetails.accountHolderName}
-                  onChange={(e) => setEditAccountDetails(prev => ({...prev, accountHolderName: e.target.value}))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter full name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                  Bank Name *
-                </label>
-                <input
-                  type="text"
-                  value={editAccountDetails.bankName}
-                  onChange={(e) => setEditAccountDetails(prev => ({...prev, bankName: e.target.value}))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter bank name"
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Account Number *
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={editAccountDetails.accountNumber}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, '');
-                      setEditAccountDetails(prev => ({...prev, accountNumber: value}));
-                    }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="1234567890"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Account Type *
-                  </label>
-                  <select
-                    value={editAccountDetails.accountType}
-                    onChange={(e) => setEditAccountDetails(prev => ({...prev, accountType: e.target.value}))}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  >
-                    <option value="savings">Savings</option>
-                    <option value="current">Current</option>
-                    <option value="salary">Salary</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                  <FaQrcode className="mr-2" />
-                  IFSC Code *
-                </label>
-                <input
-                  type="text"
-                  value={editAccountDetails.ifscCode}
-                  onChange={(e) => setEditAccountDetails(prev => ({...prev, ifscCode: e.target.value.toUpperCase()}))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="SBIN0001234"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                  <FaMapMarkerAlt className="mr-2" />
-                  Branch Name
-                </label>
-                <input
-                  type="text"
-                  value={editAccountDetails.branchName}
-                  onChange={(e) => setEditAccountDetails(prev => ({...prev, branchName: e.target.value}))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter branch name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                  <FaCreditCard className="mr-2" />
-                  UPI ID (Optional)
-                </label>
-                <input
-                  type="text"
-                  value={editAccountDetails.upi}
-                  onChange={(e) => setEditAccountDetails(prev => ({...prev, upi: e.target.value.toLowerCase()}))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="username@upi"
-                />
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
-              <button
-                onClick={() => {
-                  setShowEditAccountPopup(false);
-                  setSelectedAccountForEdit(null);
-                }}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                disabled={accountLoading}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={updateBankAccount}
-                disabled={accountLoading || !editAccountDetails.bankName || !editAccountDetails.accountNumber || !editAccountDetails.ifscCode || !editAccountDetails.accountHolderName}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                {accountLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <FaCheckCircle className="mr-2" />
-                    Update Account
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  const AddAccountPopup = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center">
-              <FaPlusCircle className="mr-2 text-green-600" />
-              Add Bank Account
-            </h3>
-            <button 
-              onClick={() => {
-                setShowAddAccountPopup(false);
-                resetAccountForm();
-              }}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <FaTimesCircle className="w-6 h-6" />
-            </button>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                <FaUser className="mr-2" />
-                Account Holder Name *
-              </label>
-              <input
-                type="text"
-                value={accountDetails.accountHolderName}
-                onChange={(e) => setAccountDetails(prev => ({...prev, accountHolderName: e.target.value}))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter full name"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                Bank Name *
-              </label>
-              <input
-                type="text"
-                value={accountDetails.bankName}
-                onChange={(e) => setAccountDetails(prev => ({...prev, bankName: e.target.value}))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter bank name"
-              />
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Account Number *
-                </label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  value={accountDetails.accountNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '');
-                    setAccountDetails(prev => ({...prev, accountNumber: value}));
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="1234567890"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Account Type *
-                </label>
-                <select
-                  value={accountDetails.accountType}
-                  onChange={(e) => setAccountDetails(prev => ({...prev, accountType: e.target.value}))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="savings">Savings</option>
-                  <option value="current">Current</option>
-                  <option value="salary">Salary</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                <FaQrcode className="mr-2" />
-                IFSC Code *
-              </label>
-              <input
-                type="text"
-                value={accountDetails.ifscCode}
-                onChange={(e) => setAccountDetails(prev => ({...prev, ifscCode: e.target.value.toUpperCase()}))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="SBIN0001234"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                <FaMapMarkerAlt className="mr-2" />
-                Branch Name
-              </label>
-              <input
-                type="text"
-                value={accountDetails.branchName}
-                onChange={(e) => setAccountDetails(prev => ({...prev, branchName: e.target.value}))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter branch name"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-                <FaCreditCard className="mr-2" />
-                UPI ID (Optional)
-              </label>
-              <input
-                type="text"
-                value={accountDetails.upi}
-                onChange={(e) => setAccountDetails(prev => ({...prev, upi: e.target.value.toLowerCase()}))}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="username@upi"
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 mt-6">
-            <button
-              onClick={() => {
-                setShowAddAccountPopup(false);
-                resetAccountForm();
-              }}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              disabled={accountLoading}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={addBankAccount}
-              disabled={accountLoading || !accountDetails.bankName || !accountDetails.accountNumber || !accountDetails.ifscCode || !accountDetails.accountHolderName}
-              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {accountLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Adding...
-                </>
-              ) : (
-                <>
-                  <FaCheckCircle className="mr-2" />
-                  Add Account
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const WithdrawalPopup = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-gray-800 flex items-center">
-              <FaMoneyBillWave className="mr-2 text-blue-600" />
-              Withdraw Funds
-            </h3>
-            <button 
-              onClick={() => {
-                setShowWithdrawalPopup(false);
-                setWithdrawalAmount("");
-              }}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <FaTimesCircle className="w-6 h-6" />
-            </button>
-          </div>
-
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Available Balance:</span>
-              <span className="text-xl font-bold text-blue-600 flex items-center">
-                <FaRupeeSign className="mr-1" />
-                {formatCurrency(walletData.walletBalance)}
-              </span>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Amount to Withdraw (₹)
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaRupeeSign className="text-gray-500" />
-              </div>
-              <input
-                type="text"
-                inputMode="decimal"
-                value={withdrawalAmount}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/[^0-9.]/g, '');
-                  const decimalCount = (value.match(/\./g) || []).length;
-                  if (decimalCount <= 1) {
-                    setWithdrawalAmount(value);
-                  }
-                }}
-                onBlur={(e) => {
-                  if (e.target.value && !isNaN(e.target.value)) {
-                    const num = parseFloat(e.target.value);
-                    setWithdrawalAmount(num.toFixed(2));
-                  }
-                }}
-                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="0.00"
-              />
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Minimum withdrawal: ₹100 | Maximum: {formatCurrency(walletData.walletBalance)}
-            </p>
-          </div>
-
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-3">
-              <label className="block text-sm font-medium text-gray-700">
-                Select Account *
-              </label>
-              <button
-                onClick={() => {
-                  setShowWithdrawalPopup(false);
-                  setShowAddAccountPopup(true);
-                }}
-                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
-              >
-                <FaPlusCircle className="w-4 h-4 mr-1" />
-                Add New Account
-              </button>
-            </div>
-
-            {savedAccounts.length === 0 ? (
-              <div className="text-center py-4 border-2 border-dashed border-gray-300 rounded-lg">
-                <p className="text-gray-500 mb-2">No bank accounts saved</p>
-                <button
-                  onClick={() => {
-                    setShowWithdrawalPopup(false);
-                    setShowAddAccountPopup(true);
-                  }}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center justify-center"
-                >
-                  <FaPlusCircle className="mr-1" />
-                  Add your first account
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {savedAccounts.map((account) => (
-                  <div key={account._id} className="flex items-start">
-                    <input
-                      type="radio"
-                      id={`withdrawal-account-${account._id}`}
-                      name="withdrawalAccount"
-                      checked={selectedAccount === account._id}
-                      onChange={() => setSelectedAccount(account._id)}
-                      className="mt-1 mr-3"
-                    />
-                    <label htmlFor={`withdrawal-account-${account._id}`} className="flex-1 cursor-pointer">
-                      <div className={`p-3 rounded-lg border ${selectedAccount === account._id ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1 min-w-0">
-                            <span className="font-medium truncate block">{account.bankName}</span>
-                            <p className="text-sm text-gray-600 mt-1 truncate">
-                              ****{account.accountNumber?.slice(-4)} • {account.accountHolderName}
-                            </p>
-                          </div>
-                          {account.isDefault && (
-                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded flex items-center ml-2 flex-shrink-0">
-                              <FaCheckCircle className="mr-1" />
-                              Default
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-            <button
-              onClick={() => {
-                setShowWithdrawalPopup(false);
-                setWithdrawalAmount("");
-              }}
-              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              disabled={withdrawalLoading}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleWithdrawalSubmit}
-              disabled={withdrawalLoading || !withdrawalAmount || parseFloat(withdrawalAmount) < 100 || parseFloat(withdrawalAmount) > walletData.walletBalance || !selectedAccount}
-              className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {withdrawalLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  <FaMoneyBillWave className="mr-2" />
-                  Confirm Withdrawal
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const DeleteConfirmationModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-        <div className="mb-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-2 flex items-center">
-            <FaTrash className="mr-2 text-red-600" />
-            Delete Account
-          </h3>
-          <p className="text-gray-600">Are you sure you want to delete this bank account? This action cannot be undone.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3">
-          <button
-            onClick={() => setShowDeleteConfirm(null)}
-            className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={() => deleteBankAccount(showDeleteConfirm)}
-            className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center"
-          >
-            <FaTrash className="mr-2" />
-            Delete Account
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 p-4 md:p-6">
-      {showAddAccountPopup && <AddAccountPopup />}
-      {showViewAccountPopup && <ViewAccountModal />}
-      {showEditAccountPopup && <EditAccountModal />}
-      {showWithdrawalPopup && <WithdrawalPopup />}
-      {showDeleteConfirm && <DeleteConfirmationModal />}
+      <AddAccountModal 
+        isOpen={showAddAccountPopup}
+        onClose={() => setShowAddAccountPopup(false)}
+        onAdd={addBankAccount}
+        loading={accountLoading}
+      />
+      <ViewAccountModal 
+        isOpen={showViewAccountPopup}
+        account={selectedAccountForView}
+        onClose={() => {
+          setShowViewAccountPopup(false);
+          setSelectedAccountForView(null);
+        }}
+      />
+      <EditAccountModal 
+        isOpen={showEditAccountPopup}
+        account={selectedAccountForEdit}
+        onClose={() => {
+          setShowEditAccountPopup(false);
+          setSelectedAccountForEdit(null);
+        }}
+        onUpdate={updateBankAccount}
+        loading={accountLoading}
+      />
+      <WithdrawalModal 
+        isOpen={showWithdrawalPopup}
+        onClose={() => setShowWithdrawalPopup(false)}
+        onSubmit={handleWithdrawalSubmit}
+        balance={walletData.walletBalance}
+        savedAccounts={savedAccounts}
+        selectedAccount={selectedAccount}
+        setSelectedAccount={setSelectedAccount}
+        loading={withdrawalLoading}
+      />
+      <DeleteConfirmationModal 
+        isOpen={showDeleteConfirm !== null}
+        onClose={() => setShowDeleteConfirm(null)}
+        onConfirm={() => deleteBankAccount(showDeleteConfirm)}
+      />
       
       <div className="max-w-7xl mx-auto">
         {/* Mobile Header */}
@@ -1332,7 +1308,7 @@ export default function VendorWallet() {
               </button>
             </div>
 
-            {/* Mobile Action Buttons - NOT FIXED */}
+            {/* Mobile Action Buttons */}
             <div className="md:hidden mb-8 flex flex-col space-y-3">
               <button 
                 onClick={() => setShowWithdrawalPopup(true)}
@@ -1419,9 +1395,9 @@ export default function VendorWallet() {
                             <span className={`px-2 py-1 text-xs font-medium rounded-full ${account.isDefault ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
                               {account.isDefault ? 'Default' : 'Additional'}
                             </span>
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${account.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            {/* <span className={`px-2 py-1 text-xs font-medium rounded-full ${account.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                               {account.status}
-                            </span>
+                            </span> */}
                           </div>
                         </div>
                         <div className="flex justify-end space-x-2 pt-3 border-t border-gray-100">
@@ -1497,10 +1473,10 @@ export default function VendorWallet() {
                                   {account.isDefault ? <FaCheckCircle className="mr-1" /> : null}
                                   {account.isDefault ? 'Default' : 'Additional'}
                                 </span>
-                                <span className={`px-2 py-1 text-xs font-medium rounded-full w-fit flex items-center ${account.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                {/* <span className={`px-2 py-1 text-xs font-medium rounded-full w-fit flex items-center ${account.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                   {account.status === 'active' ? <FaCheckCircle className="mr-1" /> : null}
                                   {account.status}
-                                </span>
+                                </span> */}
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
