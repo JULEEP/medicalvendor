@@ -17,23 +17,29 @@ const NotificationsPage = () => {
 
   // ✅ Fetch
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await axios.get(
-          `http://31.97.206.144:7021/api/vendor/notifications/${vendorId}`
-        );
+  const fetchNotifications = async () => {
+    try {
+      const res = await axios.get(
+        `http://31.97.206.144:7021/api/vendor/notifications/${vendorId}`
+      );
 
-        const data = res.data.notifications || [];
-        setNotifications([...data].reverse());
-      } catch (err) {
-        setError("Error fetching notifications");
-      } finally {
-        setLoading(false);
-      }
-    };
+      const data = res.data.notifications || [];
+      setNotifications([...data].reverse());
+    } catch (err) {
+      setError("Error fetching notifications");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  fetchNotifications(); // initial load
+
+  const interval = setInterval(() => {
     fetchNotifications();
-  }, [vendorId]);
+  }, 10000); // 10 seconds
+
+  return () => clearInterval(interval); // cleanup
+}, [vendorId]);
 
   // ✅ Pagination
   const totalPages = Math.ceil(notifications.length / PER_PAGE);
