@@ -57,7 +57,7 @@ const PrescriptionsComponent = () => {
     try {
       const response = await axios.get(`http://31.97.206.144:7021/api/vendor/getprescriptions/${vendorId}`);
       console.log("Prescriptions API Response:", response.data);
-      
+
       if (response.data && response.data.prescriptions) {
         setPrescriptions(response.data.prescriptions);
       } else {
@@ -74,7 +74,7 @@ const PrescriptionsComponent = () => {
     try {
       const response = await axios.get(`http://31.97.206.144:7021/api/vendor/medicines/${vendorId}`);
       console.log("Medicines API Response:", response.data);
-      
+
       if (response.data.medicines && Array.isArray(response.data.medicines)) {
         setMedicines(response.data.medicines);
       } else {
@@ -108,20 +108,20 @@ const PrescriptionsComponent = () => {
       // ✅ FIXED: Check if response is successful
       if (response.data && (response.data.success || response.data.message)) {
         // ✅ Update local state
-        const updatedPrescriptions = prescriptions.map(prescription => 
-          prescription.prescriptionId === selectedPrescription.prescriptionId 
+        const updatedPrescriptions = prescriptions.map(prescription =>
+          prescription.prescriptionId === selectedPrescription.prescriptionId
             ? { ...prescription, status: newStatus }
             : prescription
         );
-        
+
         setPrescriptions(updatedPrescriptions);
-        
+
         // ✅ Show success message
         alert("✅ Status updated successfully!");
-        
+
         // ✅ Close modal
         closeModal();
-        
+
       } else {
         alert("❌ Failed to update status");
       }
@@ -189,10 +189,10 @@ const PrescriptionsComponent = () => {
   // Handle medicine selection change
   const handleMedicineChange = (index, field, value) => {
     const updatedMedicineDetails = [...orderFormData.medicineDetails];
-    
+
     if (field === 'medicineId') {
       const selectedMedicine = medicines.find(med => med._id === value);
-      
+
       if (selectedMedicine) {
         updatedMedicineDetails[index] = {
           ...updatedMedicineDetails[index],
@@ -214,7 +214,7 @@ const PrescriptionsComponent = () => {
         [field]: value
       };
     }
-    
+
     setOrderFormData({
       ...orderFormData,
       medicineDetails: updatedMedicineDetails
@@ -262,7 +262,7 @@ const PrescriptionsComponent = () => {
   // Create Order Function
   const handleCreateOrder = async () => {
     try {
-      const isValidMedicineDetails = orderFormData.medicineDetails.every(med => 
+      const isValidMedicineDetails = orderFormData.medicineDetails.every(med =>
         med.medicineId && med.quantity > 0
       );
 
@@ -286,8 +286,8 @@ const PrescriptionsComponent = () => {
         payload
       );
 
-      if (response.status === 201) {
-        alert("Order created successfully!");
+      if (response.status === 200) {
+        alert("Order Sent successfully!");
         closeCreateOrderModal();
         // Refresh prescriptions to show updated status
         fetchPrescriptions();
@@ -351,11 +351,10 @@ const PrescriptionsComponent = () => {
                     {new Date(prescription.createdAt).toLocaleString()}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      prescription.status === 'Approved' ? 'bg-green-100 text-green-800' :
-                      prescription.status === 'Rejected' ? 'bg-red-100 text-red-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${prescription.status === 'Approved' ? 'bg-green-100 text-green-800' :
+                        prescription.status === 'Rejected' ? 'bg-red-100 text-red-800' :
+                          'bg-yellow-100 text-yellow-800'
+                      }`}>
                       {prescription.status || "Pending"}
                     </span>
                   </td>
@@ -369,20 +368,22 @@ const PrescriptionsComponent = () => {
                     >
                       <FaEye size={16} />
                     </a>
-                    <button
+                    {/* <button
                       onClick={() => openModal(prescription)}
                       className="text-yellow-600 hover:text-yellow-800 mx-1"
                       title="Edit Status"
                     >
                       <FaEdit size={16} />
-                    </button>
-                    <button
-                      onClick={() => openCreateOrderModal(prescription)}
-                      className="text-green-600 hover:text-green-800 mx-1"
-                      title="Create Order"
-                    >
-                      <FaPlus size={16} />
-                    </button>
+                    </button> */}
+                    {prescription.status === 'pending' &&
+                      <button
+                        onClick={() => openCreateOrderModal(prescription)}
+                        className="text-green-600 hover:text-green-800 mx-1"
+                        title="Create Order"
+                      >
+                        <FaPlus size={16} />
+                      </button>
+                    }
                   </td>
                 </tr>
               ))
@@ -437,7 +438,7 @@ const PrescriptionsComponent = () => {
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <h3 className="text-xl font-semibold mb-4">Create Order from Prescription</h3>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">Medicine Details</label>
               {orderFormData.medicineDetails.map((medicine, index) => (

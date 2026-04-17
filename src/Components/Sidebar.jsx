@@ -133,7 +133,7 @@ const SidebarVendor = ({ isCollapsed, isMobile, setIsCollapsed }) => {
   // Mobile sidebar width - small screen ke liye compact
   const sidebarWidth = isMobile 
     ? (isSidebarOpen ? 'w-56' : 'w-0') 
-    : (isCollapsed ? 'w-16' : 'w-64');
+    : (isCollapsed ? '20' : 'w-64');
 
   return (
     <>

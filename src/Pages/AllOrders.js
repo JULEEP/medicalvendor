@@ -273,7 +273,7 @@ const AllOrders = () => {
   // Calculate total amount for an order (price * quantity)
   const calculateOrderTotal = (order) => {
     if (!order || !order.orderItems) return 0;
-    
+
     return order.orderItems.reduce((total, item) => {
       const price = Number(item.price) || Number(item.medicineId?.price) || 0;
       const quantity = Number(item.quantity) || 1;
@@ -365,7 +365,7 @@ const AllOrders = () => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-3 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">All Orders</h2>
         <div className="text-sm text-gray-500">
@@ -553,7 +553,7 @@ const AllOrders = () => {
               currentOrders.map((order, index) => (
                 <tr key={order._id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    { (currentPage - 1)*ordersPerPage + index + 1 }
+                    {(currentPage - 1) * ordersPerPage + index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -630,27 +630,36 @@ const AllOrders = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex space-x-2">
                       {/* ✅ EDIT BUTTON ADDED */}
-                      <button
-                        onClick={() => openStatusModal(order)}
-                        className="text-purple-600 hover:text-purple-800 transition-colors p-2 rounded-full hover:bg-purple-50"
-                        title="Edit Status"
-                      >
-                        <FaEdit size={16} />
-                      </button>
-                      <button
-                        onClick={() => openOrderModal(order)}
-                        className="text-blue-600 hover:text-blue-800 transition-colors p-2 rounded-full hover:bg-blue-50"
-                        title="View Full Details"
-                      >
-                        <FaEye size={16} />
-                      </button>
-                      <button
-                        onClick={() => openInvoiceModal(order)}
-                        className="text-green-600 hover:text-green-800 transition-colors p-2 rounded-full hover:bg-green-50"
-                        title="Download Invoice"
-                      >
-                        <FaFileInvoiceDollar size={16} />
-                      </button>
+                      {order.pharmacyResponse === 'Rejected' ? (
+                        <>
+                          
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => openStatusModal(order)}
+                            className="text-purple-600 hover:text-purple-800 transition-colors p-2 rounded-full hover:bg-purple-50"
+                            title="Edit Status"
+                          >
+                            <FaEdit size={16} />
+                          </button>
+                          <button
+                            onClick={() => openOrderModal(order)}
+                            className="text-blue-600 hover:text-blue-800 transition-colors p-2 rounded-full hover:bg-blue-50"
+                            title="View Full Details"
+                          >
+                            <FaEye size={16} />
+                          </button>
+                          <button
+                            onClick={() => openInvoiceModal(order)}
+                            className="text-green-600 hover:text-green-800 transition-colors p-2 rounded-full hover:bg-green-50"
+                            title="Download Invoice"
+                          >
+                            <FaFileInvoiceDollar size={16} />
+                          </button>
+                        </>
+                      )
+                      }
                       <button
                         onClick={() => deleteOrder(order._id)}
                         className="text-red-600 hover:text-red-800 transition-colors p-2 rounded-full hover:bg-red-50"
@@ -1008,7 +1017,7 @@ const AllOrders = () => {
                       <div className="flex-1">
                         <div className="font-medium text-gray-900">{item.name}</div>
                         <div className="text-sm text-gray-500 mt-1">
-                          Quantity: <span className="font-semibold">{item.quantity}</span> × 
+                          Quantity: <span className="font-semibold">{item.quantity}</span> ×
                           Price: <span className="font-semibold">{formatCurrency(item.price || item.medicineId?.price || 0)}</span>
                         </div>
                         {item.medicineId && (
@@ -1220,7 +1229,7 @@ const AllOrders = () => {
                         </tr>
                       ))}
                   </tbody>
-                  
+
                   <tfoot>
                     <tr>
                       <td colSpan="3" className="border px-4 py-2 text-right font-semibold">
