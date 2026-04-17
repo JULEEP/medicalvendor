@@ -375,7 +375,7 @@ const PrescriptionsComponent = () => {
                     >
                       <FaEdit size={16} />
                     </button> */}
-                    {prescription.status === 'pending' &&
+                    {prescription.status === 'Pending' &&
                       <button
                         onClick={() => openCreateOrderModal(prescription)}
                         className="text-green-600 hover:text-green-800 mx-1"
