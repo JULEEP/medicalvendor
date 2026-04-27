@@ -30,7 +30,7 @@ export default function UserList() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://31.97.206.144:7021/api/admin/getallusers");
+      const res = await fetch("https://api.simcurarx.com/api/admin/getallusers");
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Failed to fetch users");
@@ -51,7 +51,7 @@ export default function UserList() {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      const res = await fetch(`http://31.97.206.144:7021/api/admin/deleteusers/${id}`, {
+      const res = await fetch(`https://api.simcurarx.com/api/admin/deleteusers/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();
@@ -79,7 +79,7 @@ export default function UserList() {
   const handleUpdate = async () => {
     try {
       const res = await fetch(
-        `http://31.97.206.144:7021/api/admin/updateusers/${selectedUser.id}`,
+        `https://api.simcurarx.com/api/admin/updateusers/${selectedUser.id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

@@ -29,18 +29,18 @@ const Navbar = ({ setIsCollapsed, isCollapsed }) => {
         const vendorId = localStorage.getItem("vendorId");
 
         const vendorRes = await axios.get(
-          `http://31.97.206.144:7021/api/vendor/getvendorprofile/${vendorId}`
+          `https://api.simcurarx.com/api/vendor/getvendorprofile/${vendorId}`
         );
         setVendor(vendorRes.data.vendor);
         setStatus(vendorRes.data.vendor.status);
 
         const prescriptionsRes = await axios.get(
-          `http://31.97.206.144:7021/api/vendor/getprescriptions/${vendorId}`
+          `https://api.simcurarx.com/api/vendor/getprescriptions/${vendorId}`
         );
         setPrescriptions(prescriptionsRes.data.prescriptions);
 
         const notificationsRes = await axios.get(
-          `http://31.97.206.144:7021/api/vendor/notifications/${vendorId}`
+          `https://api.simcurarx.com/api/vendor/notifications/${vendorId}`
         );
         setNotifications(notificationsRes.data.notifications || []);
         setNotificationCount(notificationsRes.data.notifications.length);
@@ -59,7 +59,7 @@ const Navbar = ({ setIsCollapsed, isCollapsed }) => {
         try {
           const vendorId = localStorage.getItem("vendorId");
           const notificationsRes = await axios.get(
-            `http://31.97.206.144:7021/api/vendor/notifications/${vendorId}`
+            `https://api.simcurarx.com/api/vendor/notifications/${vendorId}`
           );
 
           const newNotificationCount = notificationsRes.data.notifications.length;
@@ -141,7 +141,7 @@ const Navbar = ({ setIsCollapsed, isCollapsed }) => {
       setStatus(newStatus);
 
       const res = await axios.put(
-        `http://31.97.206.144:7021/api/vendor/updatestatus/${vendorId}`,
+        `https://api.simcurarx.com/api/vendor/updatestatus/${vendorId}`,
         { status: newStatus }
       );
       console.log(res.data);

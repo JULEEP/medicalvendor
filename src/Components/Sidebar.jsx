@@ -44,7 +44,7 @@ const SidebarVendor = ({ isCollapsed, isMobile, setIsCollapsed }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("http://31.97.206.144:7021/api/vendor/logout", {}, { withCredentials: true });
+      await axios.post("https://api.simcurarx.com/api/vendor/logout", {}, { withCredentials: true });
       localStorage.removeItem("authToken");
       localStorage.removeItem("vendorId");
       alert("Logout successful");

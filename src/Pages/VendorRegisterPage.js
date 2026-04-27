@@ -292,7 +292,7 @@ const VendorRegisterPage = () => {
       data.append('categories', JSON.stringify(categoryNamesOnly));
 
       const response = await axios.post(
-        'http://31.97.206.144:7021/api/pharmacy/create-pharmacy',
+        'https://api.simcurarx.com/api/pharmacy/create-pharmacy',
         data,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );

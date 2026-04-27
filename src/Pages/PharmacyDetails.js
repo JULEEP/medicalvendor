@@ -16,7 +16,7 @@ export default function PharmacyDetails() {
       setError("");
       try {
         const res = await fetch(
-          `http://31.97.206.144:7021/api/pharmacy/singlepharmacy/${pharmacyId}`
+          `https://api.simcurarx.com/api/pharmacy/singlepharmacy/${pharmacyId}`
         );
         const data = await res.json();
         if (!res.ok) throw new Error(data.message || "Failed to fetch pharmacy");

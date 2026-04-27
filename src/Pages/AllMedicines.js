@@ -21,7 +21,7 @@ const AllMedicines = () => {
 
       setLoading(true);
       try {
-        const res = await fetch(`http://31.97.206.144:7021/api/vendor/medicines/${vendorId}`);
+        const res = await fetch(`https://api.simcurarx.com/api/vendor/medicines/${vendorId}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Failed to fetch medicines");
@@ -54,7 +54,7 @@ const AllMedicines = () => {
     if (!confirm) return;
 
     try {
-      const res = await fetch(`http://31.97.206.144:7021/api/vendor/deletemedicines/${vendorId}/${id}`, {
+      const res = await fetch(`https://api.simcurarx.com/api/vendor/deletemedicines/${vendorId}/${id}`, {
         method: "DELETE",
       });
 
@@ -77,7 +77,7 @@ const AllMedicines = () => {
     }
 
     try {
-      const res = await fetch(`http://31.97.206.144:7021/api/vendor/updatemedicines/${vendorId}/${selectedMedicine._id}`, {
+      const res = await fetch(`https://api.simcurarx.com/api/vendor/updatemedicines/${vendorId}/${selectedMedicine._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

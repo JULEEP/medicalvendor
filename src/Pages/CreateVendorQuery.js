@@ -43,7 +43,7 @@ export default function CreateVendorQuery() {
 
     try {
       const response = await fetch(
-        `http://31.97.206.144:7021/api/vendor/create-query/${vendorId}`,
+        `https://api.simcurarx.com/api/vendor/create-query/${vendorId}`,
         {
           method: "POST",
           headers: {

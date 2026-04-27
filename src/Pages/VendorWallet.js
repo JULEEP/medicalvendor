@@ -747,7 +747,7 @@ export default function VendorWallet() {
   // Fetch wallet data
   const fetchWalletData = async () => {
     try {
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/getwallet/${vendorId}`);
+      const response = await fetch(`https://api.simcurarx.com/api/vendor/getwallet/${vendorId}`);
       const data = await response.json();
 
       if (!response.ok) {
@@ -766,7 +766,7 @@ export default function VendorWallet() {
   // Fetch saved accounts
   const fetchSavedAccounts = async () => {
     try {
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/accounts/${vendorId}`);
+      const response = await fetch(`https://api.simcurarx.com/api/vendor/accounts/${vendorId}`);
       const data = await response.json();
       if (response.ok) {
         const accounts = data.accounts || [];
@@ -783,7 +783,7 @@ export default function VendorWallet() {
   // Fetch withdrawal requests
   const fetchWithdrawalRequests = async () => {
     try {
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/withdrawals/${vendorId}?limit=50`);
+      const response = await fetch(`https://api.simcurarx.com/api/vendor/withdrawals/${vendorId}?limit=50`);
       const data = await response.json();
       if (response.ok) {
         setWithdrawalRequests(data.withdrawals || []);
@@ -815,7 +815,7 @@ export default function VendorWallet() {
     setAccountLoading(true);
 
     try {
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/accounts/${vendorId}/${selectedAccountForEdit._id}`, {
+      const response = await fetch(`https://api.simcurarx.com/api/vendor/accounts/${vendorId}/${selectedAccountForEdit._id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -856,7 +856,7 @@ export default function VendorWallet() {
     setAccountLoading(true);
 
     try {
-      const addAccountResponse = await fetch(`http://31.97.206.144:7021/api/vendor/add-account/${vendorId}`, {
+      const addAccountResponse = await fetch(`https://api.simcurarx.com/api/vendor/add-account/${vendorId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -892,7 +892,7 @@ export default function VendorWallet() {
   // Delete bank account
   const deleteBankAccount = async (accountId) => {
     try {
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/accounts/${vendorId}/${accountId}`, {
+      const response = await fetch(`https://api.simcurarx.com/api/vendor/accounts/${vendorId}/${accountId}`, {
         method: "DELETE"
       });
       const data = await response.json();
@@ -940,7 +940,7 @@ export default function VendorWallet() {
     setWithdrawalLoading(true);
 
     try {
-      const withdrawalResponse = await fetch(`http://31.97.206.144:7021/api/vendor/withdraw/${vendorId}`, {
+      const withdrawalResponse = await fetch(`https://api.simcurarx.com/api/vendor/withdraw/${vendorId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -977,7 +977,7 @@ export default function VendorWallet() {
   // Download statement
   const downloadStatement = async () => {
     try {
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/getwallet/${vendorId}`);
+      const response = await fetch(`https://api.simcurarx.com/api/vendor/getwallet/${vendorId}`);
       const data = await response.json();
 
       if (!response.ok) {

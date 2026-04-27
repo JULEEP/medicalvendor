@@ -16,7 +16,7 @@ export default function MyVendorQueries() {
       }
 
       try {
-        const response = await fetch(`http://31.97.206.144:7021/api/vendor/myqueries/${vendorId}`);
+        const response = await fetch(`https://api.simcurarx.com/api/vendor/myqueries/${vendorId}`);
         const data = await response.json();
 
         if (!response.ok) throw new Error(data.message || "Failed to fetch queries.");

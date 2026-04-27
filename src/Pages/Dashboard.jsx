@@ -308,7 +308,7 @@ const DashboardVendor = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `http://31.97.206.144:7021/api/vendor/dashboard/${vendorId}?duration=${chartFilter}`
+          `https://api.simcurarx.com/api/vendor/dashboard/${vendorId}?duration=${chartFilter}`
         );
         setData(response.data);
       } catch (err) {
@@ -321,7 +321,7 @@ const DashboardVendor = () => {
     const fetchVendorProfile = async () => {
       try {
         const response = await axios.get(
-          `http://31.97.206.144:7021/api/vendor/getvendorprofile/${vendorId}`
+          `https://api.simcurarx.com/api/vendor/getvendorprofile/${vendorId}`
         );
         setVendorData(response.data.vendor);
       } catch (err) {
@@ -333,7 +333,7 @@ const DashboardVendor = () => {
       try {
         setMessagesLoading(true);
         const response = await axios.get(
-          `http://31.97.206.144:7021/api/vendor/getmessages/${vendorId}`
+          `https://api.simcurarx.com/api/vendor/getmessages/${vendorId}`
         );
         setMessages(response.data.messages || []);
       } catch (err) {

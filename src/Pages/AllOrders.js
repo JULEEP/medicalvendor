@@ -41,7 +41,7 @@ const AllOrders = () => {
 
     setLoading(true);
     try {
-      const res = await fetch(`http://31.97.206.144:7021/api/vendor/orders/${vendorId}`);
+      const res = await fetch(`https://api.simcurarx.com/api/vendor/orders/${vendorId}`);
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Failed to fetch orders");
@@ -108,7 +108,7 @@ const AllOrders = () => {
       if (!vendorId) throw new Error("Vendor ID not found");
 
       const res = await fetch(
-        `http://31.97.206.144:7021/api/vendor/orderstatus/${vendorId}/${selectedOrder._id}`,
+        `https://api.simcurarx.com/api/vendor/orderstatus/${vendorId}/${selectedOrder._id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -145,7 +145,7 @@ const AllOrders = () => {
     if (!window.confirm("Are you sure you want to delete this order?")) return;
 
     try {
-      const res = await fetch(`http://31.97.206.144:7021/api/vendor/orders/${orderId}`, {
+      const res = await fetch(`https://api.simcurarx.com/api/vendor/orders/${orderId}`, {
         method: "DELETE",
       });
       const data = await res.json();

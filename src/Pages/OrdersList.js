@@ -14,7 +14,7 @@ const OrdersList = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get("http://31.97.206.144:7021/api/admin/getallorders");
+        const response = await axios.get("https://api.simcurarx.com/api/admin/getallorders");
         if (response.data && response.data.orders) {
           setOrdersData(response.data.orders);
         }
@@ -45,7 +45,7 @@ const OrdersList = () => {
     if (selectedOrder) {
       try {
         // Update status in the backend
-        await axios.put(`http://31.97.206.144:7021/api/admin/orderstatus/${selectedOrder._id}`, { status: newStatus });
+        await axios.put(`https://api.simcurarx.com/api/admin/orderstatus/${selectedOrder._id}`, { status: newStatus });
 
         // Update the status in the local state
         setOrdersData((prevOrders) =>
@@ -64,7 +64,7 @@ const OrdersList = () => {
   const handleDelete = async (orderId) => {
     if (window.confirm("Are you sure you want to delete this order?")) {
       try {
-        await axios.delete(`http://31.97.206.144:7021/api/admin/order/${orderId}`); // Call the delete API
+        await axios.delete(`https://api.simcurarx.com/api/admin/order/${orderId}`); // Call the delete API
 
         // Remove the order from the local state
         setOrdersData(ordersData.filter((order) => order._id !== orderId));

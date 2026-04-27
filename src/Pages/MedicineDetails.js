@@ -11,7 +11,7 @@ export default function SingleMedicine() {
     const fetchMedicine = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`http://31.97.206.144:7021/api/pharmacy/sinle-medicine/${medicineId}`);
+        const res = await fetch(`https://api.simcurarx.com/api/pharmacy/sinle-medicine/${medicineId}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Failed to fetch medicine");

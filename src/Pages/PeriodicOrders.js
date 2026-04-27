@@ -45,7 +45,7 @@ const PeriodicOrders = () => {
         return;
       }
 
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/periodicorders/${vendorId}`);
+      const response = await fetch(`https://api.simcurarx.com/api/vendor/periodicorders/${vendorId}`);
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.message || 'Failed to fetch periodic orders');
@@ -68,7 +68,7 @@ const PeriodicOrders = () => {
       if (!vendorId) throw new Error("Vendor ID not found");
 
       const res = await fetch(
-        `http://31.97.206.144:7021/api/vendor/orderstatus/${vendorId}/${selectedOrder._id}`,
+        `https://api.simcurarx.com/api/vendor/orderstatus/${vendorId}/${selectedOrder._id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

@@ -34,7 +34,7 @@ export default function CreateMedicine() {
   }, []);
 
   const fetchCategories = (vendorId) => {
-    fetch(`http://31.97.206.144:7021/api/vendor/categories/${vendorId}`)
+    fetch(`https://api.simcurarx.com/api/vendor/categories/${vendorId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data?.categories) {
@@ -110,7 +110,7 @@ export default function CreateMedicine() {
       }
 
       const response = await fetch(
-        `http://31.97.206.144:7021/api/pharmacy/updatepharmacy/${vendorId}`,
+        `https://api.simcurarx.com/api/pharmacy/updatepharmacy/${vendorId}`,
         {
           method: "PUT",
           body: formData,
@@ -210,7 +210,7 @@ export default function CreateMedicine() {
 
     try {
       const res = await fetch(
-        `http://31.97.206.144:7021/api/vendor/addmedicine/${vendorId}`,
+        `https://api.simcurarx.com/api/vendor/addmedicine/${vendorId}`,
         {
           method: "POST",
           body: formData,

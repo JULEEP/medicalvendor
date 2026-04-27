@@ -12,7 +12,7 @@ export default function UserDetails() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`http://31.97.206.144:7021/api/admin/getsingleuser/${userId}`);
+        const res = await fetch(`https://api.simcurarx.com/api/admin/getsingleuser/${userId}`);
         const data = await res.json();
 
         if (!res.ok) throw new Error(data.message || "Failed to fetch user");

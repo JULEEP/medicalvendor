@@ -20,7 +20,7 @@ const NotificationsPage = () => {
   const fetchNotifications = async () => {
     try {
       const res = await axios.get(
-        `http://31.97.206.144:7021/api/vendor/notifications/${vendorId}`
+        `https://api.simcurarx.com/api/vendor/notifications/${vendorId}`
       );
 
       const data = res.data.notifications || [];
@@ -96,7 +96,7 @@ const NotificationsPage = () => {
     if (!window.confirm("Delete this notification?")) return;
 
     await axios.delete(
-      `http://31.97.206.144:7021/api/vendor/deletenotification/${vendorId}/${id}`
+      `https://api.simcurarx.com/api/vendor/deletenotification/${vendorId}/${id}`
     );
 
     setNotifications((prev) => prev.filter((n) => n._id !== id));
@@ -123,7 +123,7 @@ const NotificationsPage = () => {
       for (let id of selected) {
         try {
           await axios.delete(
-            `http://31.97.206.144:7021/api/vendor/deletenotification/${vendorId}/${id}`
+            `https://api.simcurarx.com/api/vendor/deletenotification/${vendorId}/${id}`
           );
           successIds.push(id);
         } catch (err) {

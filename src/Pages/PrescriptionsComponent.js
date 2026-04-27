@@ -55,7 +55,7 @@ const PrescriptionsComponent = () => {
     setError("");
 
     try {
-      const response = await axios.get(`http://31.97.206.144:7021/api/vendor/getprescriptions/${vendorId}`);
+      const response = await axios.get(`https://api.simcurarx.com/api/vendor/getprescriptions/${vendorId}`);
       console.log("Prescriptions API Response:", response.data);
 
       if (response.data && response.data.prescriptions) {
@@ -72,7 +72,7 @@ const PrescriptionsComponent = () => {
   // Fetch medicines function
   const fetchMedicines = async () => {
     try {
-      const response = await axios.get(`http://31.97.206.144:7021/api/vendor/medicines/${vendorId}`);
+      const response = await axios.get(`https://api.simcurarx.com/api/vendor/medicines/${vendorId}`);
       console.log("Medicines API Response:", response.data);
 
       if (response.data.medicines && Array.isArray(response.data.medicines)) {
@@ -99,7 +99,7 @@ const PrescriptionsComponent = () => {
       console.log("New status:", newStatus);
 
       const response = await axios.patch(
-        `http://31.97.206.144:7021/api/vendor/updatePrescriptionStatus/${selectedPrescription.prescriptionId}`,
+        `https://api.simcurarx.com/api/vendor/updatePrescriptionStatus/${selectedPrescription.prescriptionId}`,
         { status: newStatus }
       );
 
@@ -282,7 +282,7 @@ const PrescriptionsComponent = () => {
       console.log("Creating order with payload:", payload);
 
       const response = await axios.post(
-        `http://31.97.206.144:7021/api/vendor/createOrderFromPrescription/${selectedPrescription.prescriptionId}/${vendorId}/${selectedPrescription.userId.userid || selectedPrescription.userId._id || selectedPrescription.userId}`,
+        `https://api.simcurarx.com/api/vendor/createOrderFromPrescription/${selectedPrescription.prescriptionId}/${vendorId}/${selectedPrescription.userId.userid || selectedPrescription.userId._id || selectedPrescription.userId}`,
         payload
       );
 

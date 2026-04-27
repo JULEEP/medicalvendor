@@ -15,7 +15,7 @@ export default function SingleOrder() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`http://31.97.206.144:7021/api/admin/singleorder/${orderId}`);
+      const res = await fetch(`https://api.simcurarx.com/api/admin/singleorder/${orderId}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to fetch order");
       setOrder(data.order);

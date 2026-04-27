@@ -26,7 +26,7 @@ export default function PharmacyList() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch("http://31.97.206.144:7021/api/pharmacy/getallpjarmacy");
+      const res = await fetch("https://api.simcurarx.com/api/pharmacy/getallpjarmacy");
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message || "Failed to fetch");
@@ -73,7 +73,7 @@ export default function PharmacyList() {
 
     try {
       const res = await fetch(
-        `http://31.97.206.144:7021/api/pharmacy/updatepharmacy/${editingPharmacy._id}`,
+        `https://api.simcurarx.com/api/pharmacy/updatepharmacy/${editingPharmacy._id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -105,7 +105,7 @@ export default function PharmacyList() {
     if (!window.confirm("Are you sure you want to delete this pharmacy?")) return;
 
     try {
-      const res = await fetch(`http://31.97.206.144:7021/api/pharmacy/deletepharmacy/${id}`, {
+      const res = await fetch(`https://api.simcurarx.com/api/pharmacy/deletepharmacy/${id}`, {
         method: "DELETE",
       });
       const data = await res.json();

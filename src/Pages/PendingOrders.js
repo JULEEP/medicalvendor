@@ -41,7 +41,7 @@ const PendingOrders = () => {
         return;
       }
 
-      const response = await fetch(`http://31.97.206.144:7021/api/vendor/pendingorders/${vendorId}`);
+      const response = await fetch(`https://api.simcurarx.com/api/vendor/pendingorders/${vendorId}`);
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.message || 'Failed to fetch pending orders');
@@ -64,7 +64,7 @@ const PendingOrders = () => {
       if (!vendorId) throw new Error("Vendor ID not found");
 
       const res = await fetch(
-        `http://31.97.206.144:7021/api/vendor/orderstatus/${vendorId}/${selectedOrder._id}`,
+        `https://api.simcurarx.com/api/vendor/orderstatus/${vendorId}/${selectedOrder._id}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

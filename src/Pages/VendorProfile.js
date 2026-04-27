@@ -32,7 +32,7 @@ const VendorProfile = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `http://31.97.206.144:7021/api/vendor/getvendorprofile/${vendorId}`
+          `https://api.simcurarx.com/api/vendor/getvendorprofile/${vendorId}`
         );
         setVendor(res.data.vendor);
         setStatus(res.data.vendor.status);
@@ -61,7 +61,7 @@ const VendorProfile = () => {
       setStatus(newStatus);
 
       const res = await axios.put(
-        `http://31.97.206.144:7021/api/vendor/updatestatus/${vendorId}`,
+        `https://api.simcurarx.com/api/vendor/updatestatus/${vendorId}`,
         { status: newStatus }
       );
       console.log(res.data);
@@ -75,7 +75,7 @@ const VendorProfile = () => {
     try {
       const vendorId = localStorage.getItem("vendorId");
       const response = await axios.put(
-        `http://31.97.206.144:7021/api/vendor/updatevendorprofile/${vendorId}`,
+        `https://api.simcurarx.com/api/vendor/updatevendorprofile/${vendorId}`,
         editedVendor
       );
       setVendor(response.data.vendor);
@@ -89,7 +89,7 @@ const VendorProfile = () => {
     try {
       const vendorId = localStorage.getItem("vendorId");
       const response = await axios.post(
-        `http://31.97.206.144:7021/api/vendor/addbankdetails/${vendorId}`,
+        `https://api.simcurarx.com/api/vendor/addbankdetails/${vendorId}`,
         editedBankDetails
       );
       console.log("Bank details added: ", response.data);
@@ -111,7 +111,7 @@ const VendorProfile = () => {
       }
 
       const response = await axios.put(
-        `http://31.97.206.144:7021/api/vendor/editbankdetails/${vendorId}/${bankDetailId}`,
+        `https://api.simcurarx.com/api/vendor/editbankdetails/${vendorId}/${bankDetailId}`,
         editedBankDetails
       );
 
